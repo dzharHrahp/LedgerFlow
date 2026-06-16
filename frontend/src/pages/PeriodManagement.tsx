@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { AppShell } from "../components/Appshell";
+import { AppShell } from "../components/AppShell";
 import { periodsService } from "../services/periodsService";
 import { useAuth } from "../context/AuthContext";
 import { pushNotification } from "../components/Header";

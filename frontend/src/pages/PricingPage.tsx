@@ -14,7 +14,7 @@ import {
   formatPrice,
   type Plan,
 } from "../services/paymentService";
-import { AppShell } from "../components/Appshell";
+import { AppShell } from "../components/AppShell";
 import {
   Check,
   X,
@@ -229,60 +229,69 @@ export default function PricingPage() {
             Pricing yang Transparan
           </div>
           <motion.h1
-  initial="hidden"
-  animate="visible"
-  variants={{
-    hidden: {},
-    visible: {
-      transition: { staggerChildren: 0.035, delayChildren: 0.2 },
-    },
-  }}
-  className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-center"
->
-  {/* Baris 1 */}
-  <span className="block text-gray-900 dark:text-white">
-    {"Pilih Plan yang Tepat".split("").map((char, i) => (
-      <motion.span
-        key={`a-${i}`}
-        variants={{
-          hidden: { y: 40, opacity: 0, rotateX: -90 },
-          visible: {
-            y: 0,
-            opacity: 1,
-            rotateX: 0,
-            transition: { type: "spring", stiffness: 200, damping: 18 },
-          },
-        }}
-        className="inline-block"
-        style={{ transformOrigin: "bottom center" }}
-      >
-        {char === " " ? "\u00A0" : char}
-      </motion.span>
-    ))}
-  </span>
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: {
+                transition: { staggerChildren: 0.035, delayChildren: 0.2 },
+              },
+            }}
+            className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-center"
+          >
+            {/* Baris 1 */}
+            <span className="block text-gray-900 dark:text-white">
+              {"Pilih Plan yang Tepat".split("").map((char, i) => (
+                <motion.span
+                  key={`a-${i}`}
+                  variants={{
+                    hidden: { y: 40, opacity: 0, rotateX: -90 },
+                    visible: {
+                      y: 0,
+                      opacity: 1,
+                      rotateX: 0,
+                      transition: {
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 18,
+                      },
+                    },
+                  }}
+                  className="inline-block"
+                  style={{ transformOrigin: "bottom center" }}
+                >
+                  {char === " " ? "\u00A0" : char}
+                </motion.span>
+              ))}
+            </span>
 
-  {/* Baris 2 — gradient */}
-  <span className="block mt-2 bg-gradient-to-r from-primary-600 to-cyan-500 bg-clip-text text-transparent">
-    {"untuk Bisnis Anda".split("").map((char, i) => (
-      <motion.span
-        key={`b-${i}`}
-        variants={{
-          hidden: { y: 40, opacity: 0, rotateX: -90 },
-          visible: {
-            y: 0,
-            opacity: 1,
-            rotateX: 0,
-            transition: { type: "spring", stiffness: 200, damping: 18 },
-          },
-        }}
-        className="inline-block"
-        style={{ transformOrigin: "bottom center" }}
-      >
-        {char === " " ? "\u00A0" : char}
-      </motion.span>
-    ))}
-  </span>
-</motion.h1>          <p className="mt-4 text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            {/* Baris 2 — gradient */}
+            <span className="block mt-2 bg-gradient-to-r from-primary-600 to-cyan-500 bg-clip-text text-transparent">
+              {"untuk Bisnis Anda".split("").map((char, i) => (
+                <motion.span
+                  key={`b-${i}`}
+                  variants={{
+                    hidden: { y: 40, opacity: 0, rotateX: -90 },
+                    visible: {
+                      y: 0,
+                      opacity: 1,
+                      rotateX: 0,
+                      transition: {
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 18,
+                      },
+                    },
+                  }}
+                  className="inline-block"
+                  style={{ transformOrigin: "bottom center" }}
+                >
+                  {char === " " ? "\u00A0" : char}
+                </motion.span>
+              ))}
+            </span>
+          </motion.h1>{" "}
+          <p className="mt-4 text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Mulai gratis, upgrade kapan saja. Semua plan termasuk 15 hari free
             trial untuk fitur premium.
           </p>

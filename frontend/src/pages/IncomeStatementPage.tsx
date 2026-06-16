@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useIncomeStatement } from "../hooks/useIncomeStatement";
 import { reportsService } from "../services/reportsService";
-import { AppShell } from "../components/Appshell";
+import { AppShell } from "../components/AppShell";
 import { HoverDropdown } from "../components/HoverDropdown";
 import { exportIncomeStatementPDF } from "../utils/exportPDF";
 import {

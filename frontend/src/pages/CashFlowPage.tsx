@@ -12,7 +12,7 @@ import {
   Sparkles,
   Download,
 } from "lucide-react";
-import { AppShell } from "../components/Appshell";
+import { AppShell } from "../components/AppShell";
 import { reportsService } from "../services/reportsService";
 import { useCashFlow } from "../hooks/useCashFlow";
 import { HoverDropdown } from "../components/HoverDropdown";

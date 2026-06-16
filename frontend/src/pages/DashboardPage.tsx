@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useAccounts } from "../hooks/useAccounts";
 import { useDashboardData } from "../hooks/useDashboardData";
 import { reportsService } from "../services/reportsService";
-import { AppShell } from "../components/Appshell";
+import { AppShell } from "../components/AppShell";
 import { HoverDropdown } from "../components/HoverDropdown";
 import { usePagination } from "../hooks/usePagination";
 import { TablePagination } from "../components/TablePagination";
@@ -73,7 +73,9 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { accounts, loading: accountsLoading } = useAccounts();
   const [periodId, setPeriodId] = useState<string>("");
-  const { summary, loading: summaryLoading } = useDashboardData(periodId || undefined);
+  const { summary, loading: summaryLoading } = useDashboardData(
+    periodId || undefined,
+  );
   const [periods, setPeriods] = useState<Period[]>([]);
 
   useEffect(() => {
@@ -143,7 +145,11 @@ export default function DashboardPage() {
   }, [summary]);
 
   const healthLabel =
-    healthScore >= 70 ? "Sehat & Stabil" : healthScore >= 40 ? "Cukup Baik" : "Perlu Perhatian";
+    healthScore >= 70
+      ? "Sehat & Stabil"
+      : healthScore >= 40
+        ? "Cukup Baik"
+        : "Perlu Perhatian";
   const healthColor =
     healthScore >= 70
       ? "from-emerald-500 to-cyan-500"
@@ -192,23 +198,27 @@ export default function DashboardPage() {
       whileHover={{ y: -4 }}
       className="group relative rounded-2xl bg-white dark:bg-darkCard border border-gray-200 dark:border-gray-700/50 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
     >
-      <div className={`absolute top-0 right-0 w-28 h-28 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity ${iconBg}`}></div>
+      <div
+        className={`absolute top-0 right-0 w-28 h-28 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity ${iconBg}`}
+      ></div>
       <div className="relative p-5">
         <div className="flex justify-between items-start">
           <div>
             <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-semibold">
               {label}
             </p>
-            <p className={`text-2xl font-bold mt-1 tabular-nums ${valueColor || "text-gray-900 dark:text-white"}`}>
+            <p
+              className={`text-2xl font-bold mt-1 tabular-nums ${valueColor || "text-gray-900 dark:text-white"}`}
+            >
               {value}
             </p>
           </div>
-          <div className={`p-2.5 rounded-xl ${iconBg}`}>
-            {icon}
-          </div>
+          <div className={`p-2.5 rounded-xl ${iconBg}`}>{icon}</div>
         </div>
         {subtitle && (
-          <p className={`text-xs mt-3 flex items-center gap-1 ${subtitleColor || "text-gray-500"}`}>
+          <p
+            className={`text-xs mt-3 flex items-center gap-1 ${subtitleColor || "text-gray-500"}`}
+          >
             {subtitle}
           </p>
         )}
@@ -513,8 +523,7 @@ export default function DashboardPage() {
               </h3>
               <div className="flex items-center gap-3 text-xs  text-gray-700 dark:text-gray-300">
                 <span className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-cyan-500"></div>{" "}
-                  Masuk
+                  <div className="w-2 h-2 rounded-full bg-cyan-500"></div> Masuk
                 </span>
                 <span className="flex items-center gap-1  text-gray-700 dark:text-gray-300">
                   <div className="w-2 h-2 rounded-full bg-rose-500"></div>{" "}

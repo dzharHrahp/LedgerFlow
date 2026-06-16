@@ -5,7 +5,7 @@ import { useLedger } from "../hooks/useLedger";
 import { LedgerFilter } from "../components/ledger/LedgerFilter";
 import { LedgerTable } from "../components/ledger/LedgerTable";
 import { IconLedger } from "../components/ledger/LedgerShared";
-import { AppShell } from "../components/Appshell";
+import { AppShell } from "../components/AppShell";
 import { BookOpen, AlertCircle, RefreshCw } from "lucide-react";
 
 const containerVariants = {

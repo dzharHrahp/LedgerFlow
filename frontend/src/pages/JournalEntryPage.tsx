@@ -12,7 +12,7 @@ import { JournalDetail } from "../components/journal/JournalDetail";
 import { ConfirmDialog } from "../components/journal/ConfirmDialog";
 import { IconJournal, IconPlus } from "../components/journal/JournalShared";
 import { useToast } from "../context/ToastContext";
-import { AppShell } from "../components/Appshell";
+import { AppShell } from "../components/AppShell";
 import { HoverDropdown } from "../components/HoverDropdown";
 import {
   ArrowLeft,

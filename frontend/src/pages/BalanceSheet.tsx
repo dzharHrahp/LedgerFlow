@@ -10,7 +10,7 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import { AppShell } from "../components/Appshell";
+import { AppShell } from "../components/AppShell";
 import { useAuth } from "../context/AuthContext";
 import { getBalanceSheet, getPeriods } from "../services/reportsService";
 import type { BalanceSheetResponse, Period } from "../types/reports";

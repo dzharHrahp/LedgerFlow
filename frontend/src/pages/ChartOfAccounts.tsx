@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useAccounts } from "../hooks/useAccounts";
-import { AppShell } from "../components/Appshell";
+import { AppShell } from "../components/AppShell";
 import {
   PlusCircle,
   Layers,
