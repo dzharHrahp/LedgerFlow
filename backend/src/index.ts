@@ -25,10 +25,13 @@ app.use("*", prettyJSON());
 app.use(
   "*",
   cors({
-    origin: process.env.FRONTEND_URL ?? "http://localhost:5173",
+    origin: [
+      process.env.FRONTEND_URL ?? "http://localhost:5173", 
+      "https://ledger-flow-frontend-azure.vercel.app"
+    ],
     allowHeaders: ["Content-Type", "Authorization", "x-user-id", "x-company-id"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-  }),
+  })
 );
 
 // Required for Google Sign-In popup/postMessage flow
