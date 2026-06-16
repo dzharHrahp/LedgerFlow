@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { FormEvent, ChangeEvent } from "react";
 import type {
   JournalLineForm,
@@ -418,20 +419,55 @@ function AccountSelect({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [dropdownPos, setDropdownPos] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedAccount = accounts.find((a) => a.code === value);
   const displayValue = selectedAccount
     ? `${selectedAccount.code} — ${selectedAccount.name}`
     : "";
 
+  const updatePosition = useCallback(() => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      updatePosition();
+      const handleScroll = () => setIsOpen(false);
+      const handleResize = () => updatePosition();
+      window.addEventListener("scroll", handleScroll, true);
+      window.addEventListener("resize", handleResize);
+      return () => {
+        window.removeEventListener("scroll", handleScroll, true);
+        window.removeEventListener("resize", handleResize);
+      };
+    }
+  }, [isOpen, updatePosition]);
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
+      const target = e.target as Node;
       if (
         containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      )
+        !containerRef.current.contains(target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target)
+      ) {
         setIsOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -442,11 +478,56 @@ function AccountSelect({
     return a.code.toLowerCase().includes(s) || a.name.toLowerCase().includes(s);
   });
 
+  const dropdown = (
+    <div
+      ref={dropdownRef}
+      style={
+        dropdownPos
+          ? {
+              position: "fixed",
+              top: dropdownPos.top,
+              left: dropdownPos.left,
+              width: dropdownPos.width,
+            }
+          : {}
+      }
+      className="z-[9999] bg-white dark:bg-darkCard border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl max-h-56 overflow-y-auto"
+    >
+      {filtered.length === 0 ? (
+        <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+          Tidak ada akun ditemukan
+        </div>
+      ) : (
+        filtered.map((a) => (
+          <div
+            key={a.code}
+            className="px-3 py-2 text-sm hover:bg-primary-50 dark:hover:bg-primary-500/10 cursor-pointer flex flex-col"
+            onClick={() => {
+              onChange(a.code, a.name);
+              setIsOpen(false);
+              setSearch("");
+            }}
+          >
+            <span className="font-medium text-gray-800 dark:text-gray-200">
+              {a.code}
+            </span>
+            <span className="text-gray-500 dark:text-gray-400 text-[11px]">
+              {a.name}
+            </span>
+          </div>
+        ))
+      )}
+    </div>
+  );
+
   return (
     <div className="relative w-full" ref={containerRef}>
       <div
         className={`w-full px-2 py-1.5 min-h-[34px] text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-darkBg text-gray-800 dark:text-gray-200 outline-none focus-within:ring-2 focus-within:ring-primary-500/30 focus-within:border-primary-500 transition cursor-text flex items-center`}
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          setIsOpen(true);
+          updatePosition();
+        }}
       >
         {isOpen ? (
           <input
@@ -468,34 +549,9 @@ function AccountSelect({
           </span>
         )}
       </div>
-      {isOpen && (
-        <div className="absolute z-50 w-[300px] mt-1 bg-white dark:bg-darkCard border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl max-h-56 overflow-y-auto">
-          {filtered.length === 0 ? (
-            <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
-              Tidak ada akun ditemukan
-            </div>
-          ) : (
-            filtered.map((a) => (
-              <div
-                key={a.code}
-                className="px-3 py-2 text-sm hover:bg-primary-50 dark:hover:bg-primary-500/10 cursor-pointer flex flex-col"
-                onClick={() => {
-                  onChange(a.code, a.name);
-                  setIsOpen(false);
-                  setSearch("");
-                }}
-              >
-                <span className="font-medium text-gray-800 dark:text-gray-200">
-                  {a.code}
-                </span>
-                <span className="text-gray-500 dark:text-gray-400 text-[11px]">
-                  {a.name}
-                </span>
-              </div>
-            ))
-          )}
-        </div>
-      )}
+      {isOpen &&
+        typeof document !== "undefined" &&
+        createPortal(dropdown, document.body)}
     </div>
   );
 }
