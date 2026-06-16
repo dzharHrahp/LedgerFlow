@@ -92,7 +92,7 @@ function StatCard({
           </span>
           <div className={`p-1.5 rounded-lg ${accent}`}>{icon}</div>
         </div>
-        <p className="text-xl font-bold text-gray-900 dark:text-white tabular-nums">
+        <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white tabular-nums break-words">
           {value}
         </p>
         {sub && (
@@ -224,7 +224,7 @@ export default function JournalEntryPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-6xl mx-auto space-y-6"
+        className="max-w-6xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8"
       >
         {/* ── Page Header ── */}
         <motion.div
@@ -325,7 +325,7 @@ export default function JournalEntryPage() {
             variants={itemVariants}
             className="bg-white dark:bg-darkCard rounded-2xl border border-gray-200 dark:border-gray-700/50 shadow-sm px-4 py-3 flex flex-wrap gap-3 items-center"
           >
-            <div className="relative flex-1 min-w-48">
+            <div className="relative flex-1 min-w-[100%] sm:min-w-48">
               <Search
                 size={15}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"

@@ -153,7 +153,7 @@ export default function PeriodManagement() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-4xl mx-auto space-y-6"
+        className="max-w-4xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8"
       >
         {/* Header */}
         <motion.div variants={itemVariants}>
@@ -186,7 +186,10 @@ export default function PeriodManagement() {
         </motion.div>
 
         {/* Stats */}
-        <motion.div variants={itemVariants} className="grid grid-cols-3 gap-4">
+        <motion.div
+          variants={itemVariants}
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+        >
           {[
             {
               icon: Calendar,
@@ -281,7 +284,7 @@ export default function PeriodManagement() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium shadow-md hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-60 disabled:hover:scale-100 whitespace-nowrap"
+              className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium shadow-md hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-60 disabled:hover:scale-100 w-full sm:w-auto"
             >
               {isSubmitting ? (
                 <Loader2 size={16} className="animate-spin" />
@@ -330,7 +333,7 @@ export default function PeriodManagement() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.04 }}
-                  className="flex items-center justify-between px-5 py-4 hover:bg-primary-50/30 dark:hover:bg-white/5 transition-colors group"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-5 py-4 hover:bg-primary-50/30 dark:hover:bg-white/5 transition-colors group"
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -356,7 +359,7 @@ export default function PeriodManagement() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
                     {p.status === "open" ? (
                       <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-xl text-xs font-semibold border border-emerald-200 dark:border-emerald-500/20 uppercase">
                         <Unlock size={12} /> Terbuka
@@ -370,7 +373,7 @@ export default function PeriodManagement() {
                     {p.status === "open" && (
                       <button
                         onClick={() => setConfirmClose(p.id)}
-                        className="flex items-center gap-1.5 text-xs font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-500/20 transition-colors opacity-0 group-hover:opacity-100"
+                        className="flex items-center gap-1.5 text-xs font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-500/20 transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                       >
                         Tutup Buku
                       </button>

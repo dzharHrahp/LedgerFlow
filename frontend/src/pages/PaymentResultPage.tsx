@@ -74,12 +74,12 @@ export default function PaymentResultPage({ type }: PaymentResultPageProps) {
   const Icon = config.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-darkBg dark:to-gray-900 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-darkBg dark:to-gray-900 flex items-center justify-center px-4 sm:px-6 py-12">
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="max-w-md w-full text-center"
+        className="max-w-md w-full text-center mx-auto"
       >
         {/* Logo */}
         <Link to="/" className="inline-block mb-8">

@@ -54,13 +54,13 @@ export default function AuthCallback() {
 
   if (status === "error") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-darkBg">
-        <div className="text-center space-y-4">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-darkBg p-4">
+        <div className="text-center space-y-4 max-w-md mx-auto w-full">
           <div className="text-red-500 text-lg font-semibold">Login Gagal</div>
-          <p className="text-gray-500 text-sm">{errorMsg}</p>
+          <p className="text-gray-500 text-sm break-words">{errorMsg}</p>
           <a
             href="/login"
-            className="inline-block px-6 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition"
+            className="inline-block px-6 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition shadow-md w-full sm:w-auto"
           >
             Kembali ke Login
           </a>
@@ -70,8 +70,8 @@ export default function AuthCallback() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-darkBg">
-      <div className="text-center space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-darkBg p-4">
+      <div className="text-center space-y-4 max-w-md mx-auto w-full">
         <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto" />
         <p className="text-gray-500 text-sm">Menyelesaikan login...</p>
       </div>

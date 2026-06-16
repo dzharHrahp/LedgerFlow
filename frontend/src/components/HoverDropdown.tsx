@@ -143,7 +143,7 @@ export function HoverDropdown({
             exit={{ opacity: 0, y: placement === "top" ? 8 : -8, scale: 0.96 }}
             transition={{ duration: 0.15 }}
             style={{ minWidth }}
-            className={`absolute z-[9999] max-h-72 overflow-y-auto bg-white dark:bg-darkCard border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg ${
+            className={`absolute z-[9999] max-h-72 overflow-y-auto bg-white dark:bg-darkCard border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-w-[calc(100vw-1rem)] sm:max-w-none ${
               placement === "top" ? "bottom-full mb-1" : "top-full mt-1"
             } ${alignRight ? "right-0" : "left-0"} ${fullWidth ? "w-full" : ""}`}
           >
@@ -152,7 +152,7 @@ export function HoverDropdown({
                 key={option.value}
                 type="button"
                 onClick={() => handleSelect(option.value)}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${
+                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-white/5 transition-colors break-words ${
                   value === option.value
                     ? "text-primary-600 dark:text-primary-400 bg-primary-50/50 dark:bg-primary-500/10 font-medium"
                     : "text-gray-700 dark:text-gray-300"

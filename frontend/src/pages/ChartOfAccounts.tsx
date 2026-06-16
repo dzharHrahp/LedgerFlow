@@ -291,7 +291,7 @@ export default function ChartOfAccounts() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-7xl mx-auto space-y-8"
+        className="max-w-7xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8"
       >
         {/* Page Header */}
         <motion.div
@@ -326,13 +326,13 @@ export default function ChartOfAccounts() {
               Manage and organize your financial accounts efficiently.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
             <button
               onClick={() => {
                 setEditAccount(null);
                 setModalOpen(true);
               }}
-              className="group flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium shadow-md hover:shadow-primary-500/25 transition-all hover:scale-105"
+              className="group flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium shadow-md hover:shadow-primary-500/25 transition-all hover:scale-105 w-full sm:w-auto"
             >
               <PlusCircle
                 size="16"
@@ -342,13 +342,13 @@ export default function ChartOfAccounts() {
             </button>
 
             {/* Export Dropdown */}
-            <div className="relative" ref={exportRef}>
+            <div className="relative w-full sm:w-auto" ref={exportRef}>
               <button
                 onClick={() => setExportMenuOpen(!exportMenuOpen)}
-                className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors w-full sm:w-auto"
               >
                 <Download size="16" />
-                Export
+                <span>Export</span>
               </button>
               <AnimatePresence>
                 {exportMenuOpen && (
@@ -357,7 +357,7 @@ export default function ChartOfAccounts() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-darkCard rounded-xl shadow-xl border border-gray-200 dark:border-gray-700/50 overflow-hidden z-50"
+                    className="absolute right-0 mt-2 w-full sm:w-48 bg-white dark:bg-darkCard rounded-xl shadow-xl border border-gray-200 dark:border-gray-700/50 overflow-hidden z-50"
                   >
                     <button
                       onClick={() => {
@@ -366,8 +366,11 @@ export default function ChartOfAccounts() {
                       }}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-500/10 transition-colors"
                     >
-                      <FileText size={16} className="text-rose-500" />
-                      Export PDF
+                      <FileText
+                        size={16}
+                        className="text-rose-500 flex-shrink-0"
+                      />
+                      <span>Export PDF</span>
                     </button>
                     <button
                       onClick={() => {
@@ -376,8 +379,11 @@ export default function ChartOfAccounts() {
                       }}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-500/10 transition-colors border-t border-gray-100 dark:border-gray-800"
                     >
-                      <FileDown size={16} className="text-emerald-500" />
-                      Export CSV
+                      <FileDown
+                        size={16}
+                        className="text-emerald-500 flex-shrink-0"
+                      />
+                      <span>Export CSV</span>
                     </button>
                   </motion.div>
                 )}
@@ -387,10 +393,10 @@ export default function ChartOfAccounts() {
             {/* Import Button */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors w-full sm:w-auto"
             >
               <Upload size="16" />
-              Import
+              <span>Import</span>
             </button>
             <input
               ref={fileInputRef}
@@ -431,7 +437,7 @@ export default function ChartOfAccounts() {
           variants={itemVariants}
           className="relative z-30 flex flex-wrap items-center gap-3 bg-white/50 dark:bg-darkBg/50 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700/50 p-4"
         >
-          <div className="relative flex-1 min-w-[200px]">
+          <div className="relative flex-1 min-w-[100%] sm:min-w-[200px]">
             <Search
               size="16"
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -444,8 +450,8 @@ export default function ChartOfAccounts() {
               className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-darkCard text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500/40 focus:border-primary-500 transition-all"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Filter size="14" className="text-gray-400" />
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <Filter size="14" className="text-gray-400 flex-shrink-0" />
             <HoverDropdown
               value={filterType}
               onChange={setFilterType}
@@ -603,7 +609,7 @@ export default function ChartOfAccounts() {
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Preview ({importData.length} akun)
                     </p>
-                    <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead className="bg-gray-50 dark:bg-gray-800/50">
                           <tr>

@@ -122,16 +122,16 @@ export default function BalanceSheet() {
 
   return (
     <AppShell>
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-darkCard rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700/50 p-6"
+          className="bg-white dark:bg-darkCard rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700/50 p-4 sm:p-6"
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex-shrink-0">
                 <FileText className="w-6 h-6 text-primary-600 dark:text-primary-400" />
               </div>
               <div>
@@ -144,7 +144,7 @@ export default function BalanceSheet() {
                       transition: { staggerChildren: 0.04, delayChildren: 0.3 },
                     },
                   }}
-                  className="text-2xl font-bold text-gray-900 dark:text-white flex items-center flex-wrap"
+                  className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center flex-wrap"
                   style={{ perspective: "600px" }}
                 >
                   {"Neraca (Balance Sheet)".split("").map((char, i) => (
@@ -170,36 +170,38 @@ export default function BalanceSheet() {
                     </motion.span>
                   ))}
                 </motion.h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                   Laporan Posisi Keuangan Perusahaan
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <HoverDropdown
-                value={selectedPeriodId}
-                onChange={setSelectedPeriodId}
-                disabled={isLoadingReport}
-                placeholder="Pilih Periode"
-                icon={<Calendar size={16} />}
-                minWidth={210}
-                options={[
-                  { value: "", label: "Pilih Periode" },
-                  ...periods.map((period) => ({
-                    value: period.id,
-                    label: `${getPeriodLabel(period)}${
-                      period.status === "closed" ? " (Tutup)" : ""
-                    }`,
-                  })),
-                ]}
-              />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+              <div className="w-full sm:w-auto">
+                <HoverDropdown
+                  value={selectedPeriodId}
+                  onChange={setSelectedPeriodId}
+                  disabled={isLoadingReport}
+                  placeholder="Pilih Periode"
+                  icon={<Calendar size={16} />}
+                  minWidth={210}
+                  options={[
+                    { value: "", label: "Pilih Periode" },
+                    ...periods.map((period) => ({
+                      value: period.id,
+                      label: `${getPeriodLabel(period)}${
+                        period.status === "closed" ? " (Tutup)" : ""
+                      }`,
+                    })),
+                  ]}
+                />
+              </div>
               <button
                 onClick={handleExportPDF}
                 disabled={!balanceSheet || isLoadingReport}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md w-full sm:w-auto"
               >
-                <Download className="w-5 h-5" />
-                <span className="hidden md:inline">Export PDF</span>
+                <Download className="w-5 h-5 flex-shrink-0" />
+                <span>Export PDF</span>
               </button>
             </div>
           </div>

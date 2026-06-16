@@ -192,7 +192,7 @@ export default function ProfilePage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-3xl mx-auto space-y-6"
+        className="max-w-3xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8"
       >
         {/* Header */}
         <motion.div variants={itemVariants}>
@@ -374,14 +374,14 @@ export default function ProfilePage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium shadow-md hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium shadow-md hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100 w-full sm:w-auto"
               >
                 {saving ? (
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={16} className="animate-spin flex-shrink-0" />
                 ) : (
-                  <Save size={16} />
+                  <Save size={16} className="flex-shrink-0" />
                 )}
-                {saving ? "Menyimpan..." : "Simpan Perubahan"}
+                <span>{saving ? "Menyimpan..." : "Simpan Perubahan"}</span>
               </button>
             </div>
           </div>

@@ -244,7 +244,7 @@ function SummaryCard({
         </div>
       </div>
       <p
-        className={`relative text-2xl font-bold tabular-nums tracking-tight ${value >= 0 ? "text-gray-900 dark:text-white" : "text-rose-600 dark:text-rose-400"}`}
+        className={`relative text-xl sm:text-2xl font-bold tabular-nums tracking-tight break-words ${value >= 0 ? "text-gray-900 dark:text-white" : "text-rose-600 dark:text-rose-400"}`}
       >
         {value >= 0 ? "" : "-"}
         {formatIDR(Math.abs(value))}
@@ -312,8 +312,8 @@ function NetChangeCard({
           </div>
           <p className="text-white/70 text-sm">{periodName}</p>
         </div>
-        <div className="text-right">
-          <p className="text-4xl font-black text-white tabular-nums tracking-tight">
+        <div className="text-left sm:text-right">
+          <p className="text-2xl sm:text-4xl font-black text-white tabular-nums tracking-tight break-all sm:break-normal">
             {isPositive ? "+" : "-"}
             {formatIDR(Math.abs(value))}
           </p>
@@ -375,7 +375,7 @@ export default function CashFlowPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-5xl mx-auto space-y-8"
+        className="max-w-5xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8"
       >
         {/* ── Page Header ── */}
         <motion.div
@@ -414,24 +414,26 @@ export default function CashFlowPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <HoverDropdown
-              value={periodId || ""}
-              onChange={(v) => setPeriodId(v || undefined)}
-              icon={<Wallet size={14} />}
-              minWidth={200}
-              options={[
-                { value: "", label: "Semua Periode" },
-                ...periods.map((p) => ({ value: p.id, label: p.name })),
-              ]}
-            />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+            <div className="w-full sm:w-auto">
+              <HoverDropdown
+                value={periodId || ""}
+                onChange={(v) => setPeriodId(v || undefined)}
+                icon={<Wallet size={14} />}
+                minWidth={200}
+                options={[
+                  { value: "", label: "Semua Periode" },
+                  ...periods.map((p) => ({ value: p.id, label: p.name })),
+                ]}
+              />
+            </div>
             <button
               onClick={handleExportPDF}
               disabled={!data || loading}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md w-full sm:w-auto"
             >
-              <Download className="w-5 h-5" />
-              <span className="hidden md:inline">Export PDF</span>
+              <Download className="w-5 h-5 flex-shrink-0" />
+              <span>Export PDF</span>
             </button>
           </div>
         </motion.div>

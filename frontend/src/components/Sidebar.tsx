@@ -56,9 +56,9 @@ export const Sidebar = React.memo(
     if (isDesktop) {
       return (
         <aside
-          className="fixed top-0 left-0 z-40 w-64 h-[calc(100vh-57px)] mt-[57px]
+          className="fixed top-16 left-0 z-40 w-64 h-[calc(100vh-4rem)]
                    bg-white/90 dark:bg-darkBg/90 backdrop-blur-xl
-                   border-r border-primary-500/20 overflow-y-auto"
+                   border-r border-primary-500/20 overflow-y-auto shadow-lg lg:shadow-none"
         >
           <SidebarContent onLinkClick={onLinkClick} />
         </aside>
@@ -70,8 +70,8 @@ export const Sidebar = React.memo(
         initial={{ x: "-100%" }}
         animate={{ x: mobileMenuOpen ? 0 : "-100%" }}
         transition={{ type: "spring", damping: 25 }}
-        className="fixed top-0 left-0 z-40 w-64 h-[calc(100vh-57px)] mt-[57px]
-                 bg-white/90 dark:bg-darkBg/90 backdrop-blur-xl
+        className="fixed top-16 left-0 z-40 w-64 h-[calc(100vh-4rem)]
+                 bg-white/95 dark:bg-darkBg/95 backdrop-blur-2xl shadow-2xl
                  border-r border-primary-500/20 overflow-y-auto"
       >
         <SidebarContent onLinkClick={onLinkClick} />
@@ -116,8 +116,6 @@ const SidebarContent = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 
   return (
     <div className="flex flex-col h-full">
-     
-
       {/* ── Company Card (di atas menu) ── */}
       {user && (
         <div className="px-3 pt-8 pb-3">

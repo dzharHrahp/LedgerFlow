@@ -157,7 +157,7 @@ export default function HelpCenterPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-4xl mx-auto space-y-8"
+        className="max-w-4xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8"
       >
         {/* ── Header ─────────────────────────────────────────────── */}
         <motion.div variants={itemVariants} className="text-center space-y-3">

@@ -1,6 +1,11 @@
 // src/pages/HomePage.tsx
 import { useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  AnimatePresence,
+} from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -19,6 +24,8 @@ import {
   Building,
   Cloud,
   ChevronDown,
+  Menu,
+  X,
   BookOpen,
   FileText,
   TrendingUp,
@@ -157,18 +164,18 @@ function Navbar() {
         scrolled ? "shadow-lg" : "shadow-none"
       }`}
     >
-      <div className="w-full px-6 py-3 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group">
+      <div className="w-full px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
           <img
             src={logo}
             alt="LedgerFlow"
-            className="w-11 h-11 object-contain transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
+            className="w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 object-contain transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 flex-shrink-0"
           />
-          <div className="flex flex-col leading-none">
-            <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+          <div className="flex flex-col justify-center leading-none">
+            <span className="text-base sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 dark:text-white transition-all">
               LedgerFlow
             </span>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-blue-500">
+            <span className="text-[8px] sm:text-[9px] lg:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-blue-500 transition-all mt-0.5">
               Financial Platform
             </span>
           </div>
@@ -242,20 +249,20 @@ function Navbar() {
         </div>
 
         {/* Right Buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <ThemeSwitcher />
 
           {user ? (
             <>
               <Link
                 to="/dashboard"
-                className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl shadow-md hover:shadow-lg transition"
+                className="hidden sm:inline-flex px-4 py-2 text-sm font-semibold bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl shadow-md hover:shadow-lg transition"
               >
                 Dashboard
               </Link>
               <button
                 onClick={logout}
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600"
+                className="hidden sm:inline-flex text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600"
               >
                 Logout
               </button>
@@ -264,15 +271,9 @@ function Navbar() {
             <>
               <Link
                 to="/login"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600"
+                className="hidden sm:inline-flex text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600"
               >
                 Sign in
-              </Link>
-              <Link
-                to="/register"
-                className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl shadow-md hover:shadow-lg transition"
-              >
-                Start 15-day free trial
               </Link>
             </>
           )}
@@ -280,61 +281,110 @@ function Navbar() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-1.5 text-gray-600 dark:text-gray-400"
+            className="lg:hidden p-2 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-darkCard transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+            aria-label="Toggle mobile menu"
           >
-            <ChevronDown
-              size={20}
-              className={`transition-transform ${mobileMenuOpen ? "rotate-180" : ""}`}
-            />
+            <motion.div
+              initial={false}
+              animate={{
+                rotate: mobileMenuOpen ? 180 : 0,
+                scale: mobileMenuOpen ? 1.05 : 1,
+              }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+            >
+              {mobileMenuOpen ? (
+                <X
+                  size={22}
+                  className="text-primary-600 dark:text-primary-400"
+                />
+              ) : (
+                <Menu size={22} />
+              )}
+            </motion.div>
           </button>
         </div>
       </div>
 
       {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-gray-200 dark:border-gray-700 px-6 py-4 space-y-2">
-          {menuItems.map((item) => (
-            <div key={item.key}>
-              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-3 mb-1">
-                {item.name}
-              </p>
-              {item.items.map((sub) => (
-                <a
-                  key={sub.title}
-                  href="#"
-                  className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 py-1.5 hover:text-primary-600"
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:hidden border-t border-gray-200 dark:border-gray-700/80 bg-white/95 dark:bg-darkCard/95 backdrop-blur-xl overflow-hidden rounded-b-2xl shadow-2xl"
+          >
+            <div className="px-6 py-6 space-y-6 max-h-[82vh] overflow-y-auto">
+              <div className="space-y-6">
+                {menuItems.map((item) => (
+                  <div key={item.key} className="space-y-2.5">
+                    <p className="text-xs font-extrabold text-primary-600 dark:text-primary-400 uppercase tracking-wider px-1">
+                      {item.name}
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-gray-50/70 dark:bg-[#111827]/70 p-3 rounded-2xl border border-gray-100 dark:border-gray-800">
+                      {item.items.map((sub) => (
+                        <a
+                          key={sub.title}
+                          href="#"
+                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white dark:hover:bg-darkCard text-gray-800 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-all group/mob shadow-sm hover:shadow"
+                        >
+                          <div className="p-2 rounded-xl bg-primary-50 dark:bg-primary-500/10 text-primary-500 group-hover/mob:scale-110 transition-transform flex-shrink-0 mt-0.5">
+                            <sub.icon size={18} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-bold leading-snug">
+                              {sub.title}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                              {sub.desc}
+                            </p>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Action Links in Mobile Menu */}
+              <div className="border-t border-gray-200 dark:border-gray-700/80 pt-6 flex flex-col sm:flex-row gap-3">
+                <Link
+                  to="/pricing"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 transition-all shadow-sm"
                 >
-                  <sub.icon size={14} className="text-primary-500" />
-                  {sub.title}
-                </a>
-              ))}
+                  Pricing
+                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      to="/dashboard"
+                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+                    >
+                      <span>Dashboard</span> <ArrowRight size={16} />
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className="w-full sm:w-auto px-4 py-3 text-sm font-semibold text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-all"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+                    >
+                      <span>Sign in</span> <ArrowRight size={16} />
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
-          ))}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
-            <Link
-              to="/login"
-              className="block text-sm font-semibold text-primary-600 py-1"
-            >
-              Pricing
-            </Link>
-            {user ? (
-              <Link
-                to="/dashboard"
-                className="block text-sm font-semibold text-primary-600 py-1"
-              >
-                Dashboard →
-              </Link>
-            ) : (
-              <Link
-                to="/login"
-                className="block text-sm font-semibold text-primary-600 py-1"
-              >
-                Sign in →
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
@@ -386,8 +436,7 @@ function Footer() {
               "Cut our month-end close from 5 days to 8 hours" — Syafira C., CFO
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              "The automated reconciliation is a game-changer" — Dzhar R.,
-              Owner
+              "The automated reconciliation is a game-changer" — Dzhar R., Owner
             </p>
           </div>
 
@@ -548,21 +597,21 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
               Manage Your Financial Future <br />
-              <span className="bg-gradient-to-r from-primary-600 to-cyan-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary-600 to-cyan-500 bg-clip-text text-transparent break-words">
                 With Confidence
               </span>
             </h2>
-            <p className="mt-6 text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <p className="mt-6 text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-2">
               LedgerFlow eliminates manual bookkeeping, speeds up month-end
               close, and gives you real-time financials.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <div className="mt-8 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4 w-full px-4">
               {user ? (
                 <Link
                   to="/dashboard"
-                  className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2"
+                  className="w-full sm:w-auto justify-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2"
                 >
                   Go to Dashboard <ChevronRight size={18} />
                 </Link>
@@ -570,22 +619,22 @@ export default function HomePage() {
                 <>
                   <Link
                     to="/register"
-                    className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2"
+                    className="w-full sm:w-auto justify-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2"
                   >
-                    30-day free trial <ChevronRight size={18} />
+                    15-day free trial <ChevronRight size={18} />
                   </Link>
                   <Link
                     to="/login"
-                    className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    className="w-full sm:w-auto text-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                   >
                     See how it works
                   </Link>
                 </>
               )}
             </div>
-            <p className="mt-6 text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
-              <Lock size={14} /> Enterprise-grade security · SOC 2 Type II ·
-              GDPR
+            <p className="mt-6 text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex flex-wrap items-center justify-center gap-2 px-4 text-center">
+              <Lock size={14} className="flex-shrink-0" /> Enterprise-grade
+              security · SOC 2 Type II · GDPR
             </p>
           </motion.div>
         </motion.div>
@@ -862,20 +911,20 @@ export default function HomePage() {
         initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
-        className="py-20 px-6"
+        className="py-20 px-4 sm:px-6"
       >
-        <div className="max-w-5xl mx-auto bg-gradient-to-r from-primary-600 to-primary-700 rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl">
-          <h2 className="text-3xl md:text-4xl font-bold">
+        <div className="max-w-5xl mx-auto bg-gradient-to-r from-primary-600 to-primary-700 rounded-3xl p-6 sm:p-10 md:p-16 text-center text-white shadow-2xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-snug">
             Ready to transform your financial operations?
           </h2>
-          <p className="mt-4 text-primary-100 text-lg">
+          <p className="mt-4 text-primary-100 text-base sm:text-lg">
             Join thousands of businesses using LedgerFlow
           </p>
-          <div className="mt-8 flex-wrap justify-center gap-4 flex">
+          <div className="mt-8 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4">
             {user ? (
               <Link
                 to="/dashboard"
-                className="px-6 py-3 bg-white text-primary-700 rounded-xl font-semibold hover:bg-gray-100 transition flex items-center gap-2"
+                className="w-full sm:w-auto justify-center px-6 py-3 bg-white text-primary-700 rounded-xl font-semibold hover:bg-gray-100 transition flex items-center gap-2"
               >
                 Go to Dashboard <ArrowRight size={18} />
               </Link>
@@ -883,13 +932,13 @@ export default function HomePage() {
               <>
                 <Link
                   to="/register"
-                  className="px-6 py-3 bg-white text-primary-700 rounded-xl font-semibold hover:bg-gray-100 transition flex items-center gap-2"
+                  className="w-full sm:w-auto justify-center px-6 py-3 bg-white text-primary-700 rounded-xl font-semibold hover:bg-gray-100 transition flex items-center gap-2 shadow-md"
                 >
                   Start 15-day free trial <ArrowRight size={18} />
                 </Link>
                 <Link
                   to="/login"
-                  className="px-6 py-3 border border-white/30 rounded-xl font-semibold hover:bg-white/10 transition"
+                  className="w-full sm:w-auto text-center px-6 py-3 border border-white/30 rounded-xl font-semibold hover:bg-white/10 transition"
                 >
                   Contact sales
                 </Link>

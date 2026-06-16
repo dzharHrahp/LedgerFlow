@@ -63,9 +63,9 @@ export default function LoginPage() {
       </div>
 
       {/* RIGHT FORM AREA */}
-      <div className="flex-1 flex items-center justify-center p-6 relative">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 relative">
         <div
-          className={`w-full max-w-md transition-all duration-700 ${
+          className={`w-full max-w-md mx-auto transition-all duration-700 ${
             showUI ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           }`}
         >
@@ -76,7 +76,7 @@ export default function LoginPage() {
             <ArrowLeft size={16} /> Back to Home
           </Link>
 
-          <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-xl border border-primary-500/20 rounded-2xl shadow-2xl p-8">
+          <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-xl border border-primary-500/20 rounded-2xl shadow-2xl p-6 sm:p-8">
             <div className="flex justify-center mb-6">
               <img src={logo} alt="LedgerFlow" className="w-12 h-12" />
             </div>

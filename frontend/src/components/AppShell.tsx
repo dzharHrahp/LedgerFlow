@@ -52,12 +52,12 @@ export function AppShell({ children, title, description }: AppShellProps) {
 
         {mobileMenuOpen && (
           <div
-            className="fixed inset-0 top-[57px] bg-black/50 backdrop-blur-sm z-30 lg:hidden"
+            className="fixed inset-0 top-16 bg-black/60 backdrop-blur-sm z-30 lg:hidden animate-fade-in"
             onClick={closeMobileMenu}
           />
         )}
 
-        <main className="flex-1 overflow-auto p-4 lg:p-8 pt-[73px] lg:ml-64">
+        <main className="flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-8 lg:ml-64">
           {(title || description) && (
             <div className="mb-6">
               {title && (

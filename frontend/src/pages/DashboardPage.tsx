@@ -232,7 +232,7 @@ export default function DashboardPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-7xl mx-auto space-y-8"
+        className="max-w-7xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8"
       >
         {/* ═══ Hero Card (TIDAK BERUBAH) ═══ */}
         <motion.div
@@ -303,19 +303,21 @@ export default function DashboardPage() {
         {/* ═══ Period Selector Row ═══ */}
         <motion.div
           variants={itemVariants}
-          className="flex items-center justify-between"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
         >
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
             Ringkasan Keuangan
           </h2>
-          <div className="flex items-center gap-3">
-            <HoverDropdown
-              value={periodId}
-              onChange={setPeriodId}
-              options={periodOptions}
-              icon={<Calendar size={14} />}
-              minWidth={210}
-            />
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="w-full sm:w-auto">
+              <HoverDropdown
+                value={periodId}
+                onChange={setPeriodId}
+                options={periodOptions}
+                icon={<Calendar size={14} />}
+                minWidth={210}
+              />
+            </div>
           </div>
         </motion.div>
 
@@ -656,16 +658,16 @@ export default function DashboardPage() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
                   <tr>
-                    <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase">
+                    <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase min-w-[100px]">
                       Code
                     </th>
-                    <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase">
+                    <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase min-w-[180px]">
                       Nama Akun
                     </th>
-                    <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase">
+                    <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase min-w-[120px]">
                       Tipe
                     </th>
-                    <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase">
+                    <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase min-w-[120px]">
                       Status
                     </th>
                   </tr>

@@ -85,7 +85,7 @@ export function IncomeStatementPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-4xl mx-auto space-y-6"
+        className="max-w-4xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8"
       >
         {/* ── Page Header ── */}
         <motion.div
@@ -120,32 +120,43 @@ export function IncomeStatementPage() {
               Pendapatan dan beban dari jurnal yang sudah di-post
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <HoverDropdown
-              value={periodId || ""}
-              onChange={setPeriodId}
-              icon={<Calendar size={14} />}
-              minWidth={210}
-              options={[
-                { value: "", label: "Semua Periode (YTD)" },
-                ...periods.map((p) => ({ value: p.id, label: p.name })),
-              ]}
-            />
-            <button
-              onClick={handleExportPDF}
-              disabled={!data || loading}
-              className="p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-primary-500 hover:border-primary-500/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Export PDF"
-            >
-              <Download size={16} />
-            </button>
-            <button
-              onClick={refetch}
-              className="p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-primary-500 hover:border-primary-500/50 transition-colors"
-              title="Refresh"
-            >
-              <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-            </button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+            <div className="w-full sm:w-auto">
+              <HoverDropdown
+                value={periodId || ""}
+                onChange={setPeriodId}
+                icon={<Calendar size={14} />}
+                minWidth={210}
+                options={[
+                  { value: "", label: "Semua Periode (YTD)" },
+                  ...periods.map((p) => ({ value: p.id, label: p.name })),
+                ]}
+              />
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <button
+                onClick={handleExportPDF}
+                disabled={!data || loading}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-primary-500 hover:border-primary-500/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-darkCard shadow-sm"
+                title="Export PDF"
+              >
+                <Download size={16} className="flex-shrink-0" />
+                <span className="text-sm font-medium sm:hidden">
+                  Export PDF
+                </span>
+              </button>
+              <button
+                onClick={refetch}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-primary-500 hover:border-primary-500/50 transition-colors bg-white dark:bg-darkCard shadow-sm"
+                title="Refresh"
+              >
+                <RefreshCw
+                  size={16}
+                  className={loading ? "animate-spin" : ""}
+                />
+                <span className="text-sm font-medium sm:hidden">Refresh</span>
+              </button>
+            </div>
           </div>
         </motion.div>
 
@@ -339,7 +350,7 @@ export function IncomeStatementPage() {
                 {/* NET INCOME */}
                 <motion.div
                   variants={itemVariants}
-                  className={`mt-6 p-5 rounded-xl flex justify-between items-center text-lg font-bold border-2 ${
+                  className={`mt-6 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-base sm:text-lg font-bold border-2 ${
                     data.netIncome >= 0
                       ? "bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20 text-emerald-700 dark:text-emerald-400"
                       : "bg-gradient-to-r from-rose-500/10 to-rose-500/5 border-rose-500/20 text-rose-700 dark:text-rose-400"
@@ -350,7 +361,7 @@ export function IncomeStatementPage() {
                       ? "Laba Bersih (Net Income)"
                       : "Rugi Bersih (Net Loss)"}
                   </span>
-                  <span className="text-2xl tabular-nums">
+                  <span className="text-xl sm:text-2xl tabular-nums break-all sm:break-normal w-full sm:w-auto text-left sm:text-right">
                     {formatRupiah(data.netIncome)}
                   </span>
                 </motion.div>

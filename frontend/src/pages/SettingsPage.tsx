@@ -173,7 +173,7 @@ export default function SettingsPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-3xl mx-auto space-y-6"
+        className="max-w-3xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8"
       >
         {/* Header */}
         <motion.div variants={itemVariants}>
@@ -304,15 +304,15 @@ export default function SettingsPage() {
             )}
 
             {/* Action buttons */}
-            <div className="flex gap-3 pt-3">
+            <div className="flex flex-col sm:flex-row gap-3 pt-3">
               {(isFree || isTrial) && (
                 <Link
                   to="/pricing"
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium hover:shadow-md transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium hover:shadow-md transition-all shadow-sm"
                 >
-                  <Crown size={14} />
-                  Upgrade Plan
-                  <ArrowRight size={14} />
+                  <Crown size={14} className="flex-shrink-0" />
+                  <span>Upgrade Plan</span>
+                  <ArrowRight size={14} className="flex-shrink-0" />
                 </Link>
               )}
 
@@ -320,16 +320,18 @@ export default function SettingsPage() {
                 <>
                   <Link
                     to="/pricing"
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium hover:shadow-md transition-all"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium hover:shadow-md transition-all shadow-sm"
                   >
-                    Ganti Plan
+                    <span>Ganti Plan</span>
                   </Link>
                   <button
                     onClick={handleCancelSubscription}
                     disabled={cancelLoading}
-                    className="flex-1 py-2.5 text-center rounded-xl border border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-50"
+                    className="flex-1 py-2.5 px-4 text-center rounded-xl border border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-50 shadow-sm"
                   >
-                    {cancelLoading ? "Membatalkan..." : "Cancel Subscription"}
+                    <span>
+                      {cancelLoading ? "Membatalkan..." : "Cancel Subscription"}
+                    </span>
                   </button>
                 </>
               )}
@@ -541,7 +543,7 @@ export default function SettingsPage() {
         <motion.div variants={itemVariants} className="flex justify-end pb-8">
           <button
             onClick={handleSave}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium shadow-md hover:shadow-lg hover:scale-[1.02] transition-all ${
+            className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium shadow-md hover:shadow-lg hover:scale-[1.02] transition-all w-full sm:w-auto ${
               saved
                 ? "bg-emerald-500 text-white"
                 : "bg-gradient-to-r from-primary-500 to-primary-600 text-white"
@@ -549,10 +551,11 @@ export default function SettingsPage() {
           >
             {saved ? (
               <>
-                <Check size={16} /> Tersimpan!
+                <Check size={16} className="flex-shrink-0" />{" "}
+                <span>Tersimpan!</span>
               </>
             ) : (
-              "Simpan Pengaturan"
+              <span>Simpan Pengaturan</span>
             )}
           </button>
         </motion.div>
