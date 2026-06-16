@@ -1,0 +1,210 @@
+import { useState, useEffect, useCallback } from "react";
+import type { Account, AccountFormData } from "../types/account";
+import { accountsService } from "../services/accountsService";
+import { useToast } from "../context/ToastContext";
+import { pushNotification } from "../components/Header";
+
+function sortByCode(list: Account[]): Account[] {
+  return [...list].sort((a, b) => a.code.localeCompare(b.code));
+}
+
+/**
+ * Menerjemahkan error dari backend menjadi pesan yang ramah.
+ * Khususnya menangani kasus code akun duplikat (sering muncul sebagai
+ * 500/409 dengan pesan unique constraint dari database).
+ */
+function parseAccountError(e: unknown, code?: string): string {
+  // Axios-style error: e.response.data.{error|message}
+  const anyErr = e as any;
+  const status: number | undefined = anyErr?.response?.status;
+  const serverMsg: string =
+    anyErr?.response?.data?.error ||
+    anyErr?.response?.data?.message ||
+    (e instanceof Error ? e.message : "") ||
+    "";
+
+  const lower = serverMsg.toLowerCase();
+
+  // Deteksi duplikat dari berbagai kemungkinan pesan DB / backend
+  const looksDuplicate =
+    status === 409 ||
+    lower.includes("duplicate") ||
+    lower.includes("unique") ||
+    lower.includes("already exist") ||
+    lower.includes("sudah ada") ||
+    lower.includes("sudah dipakai") ||
+    (status === 500 && lower.includes("code"));
+
+  if (looksDuplicate) {
+    return code
+      ? `Code "${code}" sudah dipakai. Gunakan code yang unik.`
+      : "Code akun sudah dipakai. Gunakan code yang unik.";
+  }
+
+  if (status === 401 || status === 403)
+    return "Sesi Anda berakhir atau tidak memiliki izin. Silakan login ulang.";
+
+  if (status && status >= 500)
+    return "Server sedang bermasalah. Coba lagi beberapa saat.";
+
+  return serverMsg || "Terjadi kesalahan saat menyimpan akun.";
+}
+
+export function useAccounts() {
+  const { toast } = useToast();
+
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [toggling, setToggling] = useState(false);
+
+  const fetchAccounts = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setAccounts([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data = await accountsService.getAll();
+      const list = Array.isArray(data) ? data : [];
+
+      const mapped: Account[] = list.map((acc: any) => ({
+        id: acc.id,
+        code: acc.code,
+        name: acc.name,
+        type: (acc.type ?? "").toLowerCase(),
+        normalBalance: acc.normal_balance === "DEBIT" ? "Debit" : "Credit",
+        isActive: acc.is_active ?? true,
+      }));
+
+      setAccounts(sortByCode(mapped));
+    } catch (e) {
+      const msg =
+        e instanceof Error ? e.message : "Terjadi kesalahan saat memuat akun";
+      setError(msg);
+      setAccounts([]);
+      toast({ variant: "error", title: "Gagal memuat akun", message: msg });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    fetchAccounts();
+  }, [fetchAccounts]);
+
+  const saveAccount = useCallback(
+    async (data: AccountFormData, id?: string): Promise<boolean> => {
+      setSaving(true);
+      try {
+        if (id) {
+          await accountsService.update(id, data);
+          toast({
+            variant: "success",
+            title: "Akun berhasil diperbarui",
+            message: `${data.code} · ${data.name}`,
+          });
+        } else {
+          await accountsService.create(data);
+          toast({
+            variant: "success",
+            title: "Akun berhasil ditambahkan",
+            message: `${data.code} · ${data.name}`,
+          });
+        }
+        await fetchAccounts();
+        return true;
+      } catch (e) {
+        toast({
+          variant: "error",
+          title: "Gagal menyimpan akun",
+          message: parseAccountError(e, data.code),
+        });
+        return false;
+      } finally {
+        setSaving(false);
+      }
+    },
+    [toast, fetchAccounts],
+  );
+
+  const toggleStatus = useCallback(
+    async (account: Account) => {
+      setToggling(true);
+      const newStatus = !account.isActive;
+
+      // 1. Optimistic update: langsung ubah UI
+      setAccounts((prev) =>
+        prev.map((acc) =>
+          acc.id === account.id ? { ...acc, isActive: newStatus } : acc,
+        ),
+      );
+
+      try {
+        await accountsService.update(account.id, {
+          code: account.code,
+          name: account.name,
+          type: account.type,
+          normal_balance: account.normalBalance === "Debit" ? "DEBIT" : "CREDIT",
+          is_active: newStatus, // ✅ sesuaikan dengan backend
+        });
+
+        const title = newStatus
+          ? "Akun berhasil diaktifkan"
+          : "Akun berhasil dinonaktifkan";
+
+        // Toast (global)
+        toast({
+          variant: "success",
+          title,
+          message: `${account.code} · ${account.name}`,
+        });
+
+        // Notif header
+        pushNotification({
+          type: "account_toggled",
+          title,
+          message: `${account.code} · ${account.name} ${
+            newStatus ? "diaktifkan" : "dinonaktifkan"
+          }`,
+          link: "/chart-of-accounts",
+        });
+
+        return true;
+      } catch (e) {
+        // 2. Rollback jika gagal
+        setAccounts((prev) =>
+          prev.map((acc) =>
+            acc.id === account.id ? { ...acc, isActive: !newStatus } : acc,
+          ),
+        );
+        toast({
+          variant: "error",
+          title: "Gagal mengubah status",
+          message: e instanceof Error ? e.message : "Terjadi kesalahan",
+        });
+        return false;
+      } finally {
+        setToggling(false);
+      }
+    },
+    [toast],
+  );
+
+  return {
+    accounts,
+    loading,
+    error,
+    saving,
+    toggling,
+    fetchAccounts,
+    saveAccount,
+    toggleStatus,
+  };
+}

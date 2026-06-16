@@ -1,0 +1,562 @@
+// src/pages/SettingsPage.tsx
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { AppShell } from "../components/AppShell";
+import { useToast } from "../context/ToastContext";
+import { useSubscription } from "../hooks/useSubscription";
+import { formatPrice, cancelSubscription } from "../services/paymentService";
+import { HoverDropdown } from "../components/HoverDropdown";
+import {
+  Settings,
+  Palette,
+  Globe,
+  Bell,
+  Shield,
+  Moon,
+  Sun,
+  Monitor,
+  Check,
+  CreditCard,
+  Crown,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+  },
+};
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { type: "spring", stiffness: 300, damping: 24 },
+  },
+};
+const letterContainerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.045, delayChildren: 0.3 },
+  },
+};
+const letterVariants = {
+  hidden: { y: 40, opacity: 0, rotateX: -90 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    rotateX: 0,
+    transition: { type: "spring", stiffness: 200, damping: 18 },
+  },
+};
+
+type ThemeOption = "light" | "dark" | "system";
+type CurrencyOption = "IDR" | "USD" | "EUR" | "SGD";
+
+export default function SettingsPage() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [saved, setSaved] = useState(false);
+
+  // Subscription
+  const {
+    subscription,
+    planName,
+    isPro,
+    isEnterprise,
+    isTrial,
+    trialDaysLeft,
+    isFree,
+    isActive,
+    refresh: refreshSub,
+  } = useSubscription();
+
+  // Settings state
+  const [theme, setTheme] = useState<ThemeOption>("system");
+  const [currency, setCurrency] = useState<CurrencyOption>("IDR");
+  const [notifications, setNotifications] = useState({
+    email: true,
+    push: true,
+    journal: true,
+    report: false,
+  });
+  const [cancelLoading, setCancelLoading] = useState(false);
+
+  // Load settings from localStorage
+  useEffect(() => {
+    const savedTheme = (localStorage.getItem("theme") ||
+      "system") as ThemeOption;
+    setTheme(savedTheme);
+    const savedCurrency = (localStorage.getItem("currency") ||
+      "IDR") as CurrencyOption;
+    setCurrency(savedCurrency);
+    const savedNotif = localStorage.getItem("notifications");
+    if (savedNotif) {
+      try {
+        setNotifications(JSON.parse(savedNotif));
+      } catch {}
+    }
+  }, []);
+
+  const applyTheme = (t: ThemeOption) => {
+    setTheme(t);
+    localStorage.setItem("theme", t);
+    const root = document.documentElement;
+    if (t === "dark") {
+      root.classList.add("dark");
+    } else if (t === "light") {
+      root.classList.remove("dark");
+    } else {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (isDark) root.classList.add("dark");
+      else root.classList.remove("dark");
+    }
+  };
+
+  const handleSave = () => {
+    localStorage.setItem("currency", currency);
+    localStorage.setItem("notifications", JSON.stringify(notifications));
+    setSaved(true);
+    toast({
+      variant: "success",
+      title: "Pengaturan Disimpan!",
+      message: "Semua preferensi Anda berhasil diperbarui.",
+    });
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleCancelSubscription = async () => {
+    if (
+      !confirm(
+        "Yakin ingin cancel subscription? Anda akan dikembalikan ke plan Free.",
+      )
+    )
+      return;
+    setCancelLoading(true);
+    try {
+      await cancelSubscription("User requested from settings");
+      toast({
+        variant: "success",
+        title: "Subscription Dibatalkan",
+        message: "Anda telah dikembalikan ke plan Free.",
+      });
+      refreshSub();
+    } catch (err: any) {
+      toast({
+        variant: "error",
+        title: "Gagal",
+        message: err.message || "Gagal membatalkan subscription",
+      });
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
+  const themeOptions: {
+    value: ThemeOption;
+    label: string;
+    icon: React.ReactNode;
+  }[] = [
+    { value: "light", label: "Light", icon: <Sun size={16} /> },
+    { value: "dark", label: "Dark", icon: <Moon size={16} /> },
+    { value: "system", label: "System", icon: <Monitor size={16} /> },
+  ];
+
+  return (
+    <AppShell>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="max-w-3xl mx-auto space-y-6"
+      >
+        {/* Header */}
+        <motion.div variants={itemVariants}>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="p-2 rounded-xl bg-primary-500/10 text-primary-500">
+              <Settings size={20} />
+            </div>
+            <motion.h1
+              variants={letterContainerVariants}
+              initial="hidden"
+              animate="visible"
+              className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center flex-wrap"
+              style={{ perspective: "600px" }}
+            >
+              {"Settings".split("").map((char, i) => (
+                <motion.span
+                  key={i}
+                  variants={letterVariants}
+                  className="inline-block"
+                  style={{ transformOrigin: "bottom center" }}
+                >
+                  {char === " " ? "\u00A0" : char}
+                </motion.span>
+              ))}
+            </motion.h1>
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Kelola preferensi dan konfigurasi aplikasi
+          </p>
+        </motion.div>
+
+        {/* ── Langganan / Subscription ── */}
+        <motion.div
+          variants={itemVariants}
+          className="rounded-2xl bg-white dark:bg-darkCard border border-gray-200 dark:border-gray-700/50 shadow-md p-6"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <CreditCard size={18} className="text-primary-500" />
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+              Langganan
+            </h3>
+          </div>
+
+          <div className="space-y-3">
+            {/* Plan saat ini */}
+            <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800">
+              <div>
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  Plan Saat Ini
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {subscription?.plans?.display_name || "Free"}
+                </p>
+              </div>
+              <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
+                {formatPrice(subscription?.plans?.price_monthly || 0)}/bulan
+              </span>
+            </div>
+
+            {/* Status */}
+            <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800">
+              <div>
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  Status
+                </p>
+              </div>
+              <span
+                className={`text-xs px-2.5 py-1 rounded-lg font-medium ${
+                  isActive
+                    ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
+                    : "bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20"
+                }`}
+              >
+                {isTrial
+                  ? `Trial (${trialDaysLeft} hari tersisa)`
+                  : isActive
+                    ? "Aktif"
+                    : "Tidak Aktif"}
+              </span>
+            </div>
+
+            {/* Trial info */}
+            {isTrial && trialDaysLeft > 0 && (
+              <div className="flex items-center gap-2 py-2 px-3 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
+                <Sparkles size={14} className="text-amber-500" />
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  Trial berakhir dalam <strong>{trialDaysLeft} hari</strong>.
+                  Upgrade sekarang agar tidak kehilangan akses fitur premium.
+                </p>
+              </div>
+            )}
+
+            {/* Billing cycle */}
+            {(isPro || isEnterprise) && !isTrial && (
+              <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800">
+                <div>
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                    Siklus Pembayaran
+                  </p>
+                </div>
+                <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">
+                  {subscription?.billing_cycle === "yearly"
+                    ? "Tahunan"
+                    : "Bulanan"}
+                </span>
+              </div>
+            )}
+
+            {/* Periode berakhir */}
+            {subscription?.current_period_end && isActive && !isTrial && (
+              <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800">
+                <div>
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                    Berlaku Sampai
+                  </p>
+                </div>
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  {new Date(subscription.current_period_end).toLocaleDateString(
+                    "id-ID",
+                    {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    },
+                  )}
+                </span>
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div className="flex gap-3 pt-3">
+              {(isFree || isTrial) && (
+                <Link
+                  to="/pricing"
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium hover:shadow-md transition-all"
+                >
+                  <Crown size={14} />
+                  Upgrade Plan
+                  <ArrowRight size={14} />
+                </Link>
+              )}
+
+              {(isPro || isEnterprise) && !isTrial && (
+                <>
+                  <Link
+                    to="/pricing"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium hover:shadow-md transition-all"
+                  >
+                    Ganti Plan
+                  </Link>
+                  <button
+                    onClick={handleCancelSubscription}
+                    disabled={cancelLoading}
+                    className="flex-1 py-2.5 text-center rounded-xl border border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-50"
+                  >
+                    {cancelLoading ? "Membatalkan..." : "Cancel Subscription"}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── Appearance ── */}
+        <motion.div
+          variants={itemVariants}
+          className="rounded-2xl bg-white dark:bg-darkCard border border-gray-200 dark:border-gray-700/50 shadow-md p-6"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Palette size={18} className="text-primary-500" />
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+              Tampilan
+            </h3>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Tema
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                {themeOptions.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => applyTheme(opt.value)}
+                    className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                      theme === opt.value
+                        ? "border-primary-500 bg-primary-50 dark:bg-primary-500/10 shadow-sm"
+                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    }`}
+                  >
+                    <div
+                      className={`${theme === opt.value ? "text-primary-500" : "text-gray-400"}`}
+                    >
+                      {opt.icon}
+                    </div>
+                    <span
+                      className={`text-sm font-medium ${theme === opt.value ? "text-primary-600 dark:text-primary-400" : "text-gray-600 dark:text-gray-400"}`}
+                    >
+                      {opt.label}
+                    </span>
+                    {theme === opt.value && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary-500 flex items-center justify-center"
+                      >
+                        <Check size={12} className="text-white" />
+                      </motion.div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── Regional ── */}
+        <motion.div
+          variants={itemVariants}
+          className="rounded-2xl bg-white dark:bg-darkCard border border-gray-200 dark:border-gray-700/50 shadow-md p-6"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Globe size={18} className="text-primary-500" />
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+              Regional
+            </h3>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              Mata Uang Default
+            </label>
+            <HoverDropdown
+              value={currency}
+              onChange={(v) => setCurrency(v as CurrencyOption)}
+              fullWidth
+              minWidth={240}
+              options={[
+                { value: "IDR", label: "🇮🇩 IDR - Rupiah Indonesia" },
+                { value: "USD", label: "🇺🇸 USD - US Dollar" },
+                { value: "EUR", label: "🇪🇺 EUR - Euro" },
+                { value: "SGD", label: "🇸🇬 SGD - Singapore Dollar" },
+              ]}
+            />
+          </div>
+        </motion.div>
+
+        {/* ── Notifications ── */}
+        <motion.div
+          variants={itemVariants}
+          className="rounded-2xl bg-white dark:bg-darkCard border border-gray-200 dark:border-gray-700/50 shadow-md p-6"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Bell size={18} className="text-primary-500" />
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+              Notifikasi
+            </h3>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              {
+                key: "email" as const,
+                label: "Notifikasi Email",
+                desc: "Terima update via email",
+              },
+              {
+                key: "push" as const,
+                label: "Push Notification",
+                desc: "Notifikasi di browser",
+              },
+              {
+                key: "journal" as const,
+                label: "Journal Entry Baru",
+                desc: "Notif saat ada entry baru",
+              },
+              {
+                key: "report" as const,
+                label: "Laporan Bulanan",
+                desc: "Ringkasan laporan tiap bulan",
+              },
+            ].map((item) => (
+              <div
+                key={item.key}
+                className="flex items-center justify-between py-2"
+              >
+                <div>
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                    {item.label}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {item.desc}
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    setNotifications((prev) => ({
+                      ...prev,
+                      [item.key]: !prev[item.key],
+                    }))
+                  }
+                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
+                    notifications[item.key]
+                      ? "bg-primary-500"
+                      : "bg-gray-300 dark:bg-gray-600"
+                  }`}
+                >
+                  <div
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                      notifications[item.key]
+                        ? "translate-x-5"
+                        : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ── Security ── */}
+        <motion.div
+          variants={itemVariants}
+          className="rounded-2xl bg-white dark:bg-darkCard border border-gray-200 dark:border-gray-700/50 shadow-md p-6"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Shield size={18} className="text-primary-500" />
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+              Keamanan
+            </h3>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800">
+              <div>
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  Autentikasi
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Metode login yang aktif
+                </p>
+              </div>
+              <span className="text-xs px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                Google OAuth
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  Sesi Aktif
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Perangkat yang sedang login
+                </p>
+              </div>
+              <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                1 perangkat
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── Save Button ── */}
+        <motion.div variants={itemVariants} className="flex justify-end pb-8">
+          <button
+            onClick={handleSave}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium shadow-md hover:shadow-lg hover:scale-[1.02] transition-all ${
+              saved
+                ? "bg-emerald-500 text-white"
+                : "bg-gradient-to-r from-primary-500 to-primary-600 text-white"
+            }`}
+          >
+            {saved ? (
+              <>
+                <Check size={16} /> Tersimpan!
+              </>
+            ) : (
+              "Simpan Pengaturan"
+            )}
+          </button>
+        </motion.div>
+      </motion.div>
+    </AppShell>
+  );
+}

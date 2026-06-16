@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Dancing+Script:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #2D8CFF;
+  --secondary: #4BB6FF;
+  --accent: #7ED7FF;
+  --dark-bg: #0F172A;
+  --light-bg: #F8FAFC;
+}
+
+.dark {
+  --bg: #0F172A;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+#root,
+.App {
+  transform: none !important;
+}
+
+/* Font tulisan sambung */
+.font-script {
+  font-family: "Dancing Script", cursive;
+}
