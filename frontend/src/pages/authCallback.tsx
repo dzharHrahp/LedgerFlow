@@ -42,8 +42,26 @@ export default function AuthCallback() {
         navigate("/dashboard", { replace: true });
       } catch (err: any) {
         console.error("Auth callback error:", err);
+
+        const errorCode = err.response?.data?.error;
+
+        // ── FIXED: Kalau belum register → redirect ke register ──
+        if (errorCode === "NOT_REGISTERED") {
+          navigate("/register", {
+            replace: true,
+            state: {
+              message:
+                "Akun belum terdaftar. Silakan register terlebih dahulu.",
+            },
+          });
+          return;
+        }
+
         setErrorMsg(
-          err.response?.data?.error || err.message || "Authentication failed",
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            err.message ||
+            "Authentication failed",
         );
         setStatus("error");
       }
@@ -58,12 +76,20 @@ export default function AuthCallback() {
         <div className="text-center space-y-4 max-w-md mx-auto w-full">
           <div className="text-red-500 text-lg font-semibold">Login Gagal</div>
           <p className="text-gray-500 text-sm break-words">{errorMsg}</p>
-          <a
-            href="/login"
-            className="inline-block px-6 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition shadow-md w-full sm:w-auto"
-          >
-            Kembali ke Login
-          </a>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="/login"
+              className="inline-block px-6 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition shadow-md"
+            >
+              Kembali ke Login
+            </a>
+            <a
+              href="/register"
+              className="inline-block px-6 py-2 border border-primary-500 text-primary-600 rounded-xl hover:bg-primary-50 transition"
+            >
+              Register
+            </a>
+          </div>
         </div>
       </div>
     );

@@ -33,7 +33,10 @@ auth.post("/register", async (c) => {
       .single();
 
     if (companyError) {
-      return c.json({ step: "create_company", error: companyError.message }, 500);
+      return c.json(
+        { step: "create_company", error: companyError.message },
+        500,
+      );
     }
 
     // STEP 2 - Create auth user
@@ -45,7 +48,10 @@ auth.post("/register", async (c) => {
       });
 
     if (authError) {
-      return c.json({ step: "create_auth_user", error: authError.message }, 400);
+      return c.json(
+        { step: "create_auth_user", error: authError.message },
+        400,
+      );
     }
 
     // STEP 3 - Create user profile
@@ -62,7 +68,10 @@ auth.post("/register", async (c) => {
       .single();
 
     if (userError) {
-      return c.json({ step: "create_user_profile", error: userError.message }, 500);
+      return c.json(
+        { step: "create_user_profile", error: userError.message },
+        500,
+      );
     }
 
     const token = await signToken({
@@ -90,7 +99,10 @@ auth.post("/register", async (c) => {
   } catch (err) {
     console.error("REGISTER CRASH:", err);
     return c.json(
-      { step: "catch_block", error: err instanceof Error ? err.message : String(err) },
+      {
+        step: "catch_block",
+        error: err instanceof Error ? err.message : String(err),
+      },
       500,
     );
   }
@@ -104,7 +116,10 @@ auth.post("/login", async (c) => {
     return c.json({ error: "Email and password required" }, 400);
   }
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
   if (error) {
     return c.json({ error: "Invalid credentials" }, 401);
@@ -117,7 +132,10 @@ auth.post("/login", async (c) => {
     .single();
 
   if (profileError || !user) {
-    return c.json({ error: "User profile not found" }, 404);
+    return c.json(
+      { error: "User profile not found. Please register first." },
+      404,
+    );
   }
 
   // Ambil company name
@@ -149,6 +167,7 @@ auth.post("/login", async (c) => {
 });
 
 // ─── POST /api/auth/exchange-token ──────────────────────────────────
+// FIXED: Kalau user belum register → TOLAK, jangan auto-create
 auth.post("/exchange-token", async (c) => {
   try {
     const { supabase_token } = await c.req.json();
@@ -157,8 +176,10 @@ auth.post("/exchange-token", async (c) => {
       return c.json({ error: "supabase_token is required" }, 400);
     }
 
-    const { data: { user: authUser }, error: verifyError } =
-      await supabase.auth.getUser(supabase_token);
+    const {
+      data: { user: authUser },
+      error: verifyError,
+    } = await supabase.auth.getUser(supabase_token);
 
     if (verifyError || !authUser) {
       console.error("Token verification failed:", verifyError);
@@ -166,63 +187,43 @@ auth.post("/exchange-token", async (c) => {
     }
 
     const email = authUser.email!;
-    const name = authUser.user_metadata?.full_name
-      || authUser.user_metadata?.name
-      || email.split("@")[0];
+    const name =
+      authUser.user_metadata?.full_name ||
+      authUser.user_metadata?.name ||
+      email.split("@")[0];
 
     console.log("EXCHANGE TOKEN - OAuth user:", { email, name });
 
-    let { data: user, error: profileError } = await supabase
+    // Cek apakah user sudah register di tabel users
+    const { data: user, error: profileError } = await supabase
       .from("users")
       .select("*")
       .eq("id", authUser.id)
       .single();
 
-    let companyName = "";
-
+    // ── FIXED: User belum register → TOLAK ──
     if (profileError?.code === "PGRST116" || !user) {
-      console.log("USER NOT FOUND, CREATING NEW USER + COMPANY");
+      console.log("USER NOT FOUND — rejecting login, must register first");
 
-      const { data: company, error: companyError } = await supabase
-        .from("companies")
-        .insert({ name: `${name}'s Company`, currency: "IDR" })
-        .select()
-        .single();
+      // Hapus auth user dari Supabase agar tidak menggantung
+      // (opsional, biar user bisa register ulang dengan email yang sama)
+      await supabase.auth.admin.deleteUser(authUser.id);
 
-      if (companyError) {
-        return c.json({ step: "create_company", error: companyError.message }, 500);
-      }
-      companyName = company.name;
+      return c.json(
+        {
+          error: "NOT_REGISTERED",
+          message: "Akun belum terdaftar. Silakan register terlebih dahulu.",
+        },
+        403,
+      );
+    }
 
-      const { data: newUser, error: userError } = await supabase
-        .from("users")
-        .insert({
-          id: authUser.id,
-          company_id: company.id,
-          email,
-          name,
-          role: "owner",
-        })
-        .select()
-        .single();
-
-      if (userError) {
-        return c.json({ step: "create_user_profile", error: userError.message }, 500);
-      }
-
-      user = newUser;
-    } else if (profileError) {
+    if (profileError) {
       return c.json({ error: profileError.message }, 500);
     }
 
-    if (!user) {
-      return c.json({ error: "User not found" }, 404);
-    }
-
-    // Ambil company name kalau belum ada
-    if (!companyName) {
-      companyName = await getCompanyName(user.company_id);
-    }
+    // Ambil company name
+    const companyName = await getCompanyName(user.company_id);
 
     const token = await signToken({
       sub: user.id,
@@ -234,7 +235,9 @@ auth.post("/exchange-token", async (c) => {
     console.log("EXCHANGE TOKEN SUCCESS");
 
     // Ambil avatar_url dari auth.users.user_metadata
-    const { data: authUserData } = await supabase.auth.admin.getUserById(user.id);
+    const { data: authUserData } = await supabase.auth.admin.getUserById(
+      user.id,
+    );
     const avatarUrl = authUserData?.user?.user_metadata?.avatar_url || null;
 
     return c.json({
