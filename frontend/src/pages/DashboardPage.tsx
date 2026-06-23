@@ -241,16 +241,16 @@ export default function DashboardPage() {
         >
           <div className="absolute top-0 -right-32 w-72 h-72 bg-primary-500/30 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl"></div>
-          <div className="relative p-6 lg:p-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="relative p-4 sm:p-6 lg:p-8">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-mono text-primary-300 tracking-wider">
+                  <span className="text-[10px] sm:text-xs font-mono text-primary-300 tracking-wider">
                     FINANCIAL COMMAND CENTER
                   </span>
                 </div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-white tracking-tight">
-                  <span className="font-script text-4xl lg:text-5xl font-semibold">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
+                  <span className="font-script text-2xl sm:text-4xl lg:text-5xl font-semibold">
                     Good{" "}
                     {new Date().getHours() < 12
                       ? "Morning"
@@ -259,39 +259,39 @@ export default function DashboardPage() {
                         : "Evening"}
                   </span>
                   ,{" "}
-                  <span className="font-script text-4xl lg:text-5xl font-semibold text-primary-400">
+                  <span className="font-script text-2xl sm:text-4xl lg:text-5xl font-semibold text-primary-400">
                     {user?.name?.split(" ")[0] || "User"}
                   </span>
                 </h1>
-                <p className="text-primary-200/80 text-base mt-2 max-w-lg">
+                <p className="text-primary-200/80 text-sm sm:text-base mt-2 max-w-lg">
                   Here's your financial overview. All systems operational and
                   ready for action.
                 </p>
-                <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-400">
+                <div className="flex flex-wrap gap-2 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm text-gray-400">
                   <span className="flex items-center gap-1.5">
                     <Calendar size="14" /> {formattedDate}
                   </span>
-                  <span className="flex items-center gap-1.5">
+                  <span className="hidden sm:flex items-center gap-1.5">
                     <Building2 size="14" /> {user?.company || "LedgerFlow Corp"}
                   </span>
-                  <span className="flex items-center gap-1.5">
+                  <span className="hidden sm:flex items-center gap-1.5">
                     <Zap size="14" /> Real-time Sync
                   </span>
                 </div>
               </div>
-              {/* Quick Actions with real links */}
-              <div className="flex flex-wrap gap-2">
+              {/* Quick Actions — responsive grid */}
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
                 {quickActions.map((action) => (
                   <Link
                     key={action.label}
                     to={action.href}
-                    className="group flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-primary-500/50 hover:bg-primary-500/20 text-sm font-medium text-white transition-all duration-200 hover:scale-105"
+                    className="group flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-2 sm:py-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-primary-500/50 hover:bg-primary-500/20 text-xs sm:text-sm font-medium text-white transition-all duration-200 hover:scale-105"
                   >
                     <action.icon
-                      size="16"
-                      className="text-primary-300 group-hover:text-primary-200"
+                      size="14"
+                      className="text-primary-300 group-hover:text-primary-200 shrink-0"
                     />
-                    {action.label}
+                    <span className="truncate">{action.label}</span>
                   </Link>
                 ))}
               </div>
