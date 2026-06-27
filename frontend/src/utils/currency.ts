@@ -1,6 +1,6 @@
-/**
- * Format number to Indonesian Rupiah currency
- */
+// Helper format angka dan mata uang Rupiah
+
+// Format number menjadi mata uang Rupiah, misalnya Rp99.000
 export const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -10,9 +10,7 @@ export const formatCurrency = (value: number): string => {
   }).format(value);
 };
 
-/**
- * Format number with thousand separator
- */
+// Format angka biasa dengan pemisah ribuan
 export const formatNumber = (value: number): string => {
   return new Intl.NumberFormat("id-ID", {
     minimumFractionDigits: 0,
@@ -20,9 +18,7 @@ export const formatNumber = (value: number): string => {
   }).format(value);
 };
 
-/**
- * Get absolute value and format as currency
- */
+// Ambil nilai absolut lalu format sebagai Rupiah
 export const formatAbsCurrency = (value: number): string => {
   return formatCurrency(Math.abs(value));
 };

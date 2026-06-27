@@ -1,10 +1,9 @@
-// ─── Enums / Literals ─────────────────────────────────────────────────────────
+// Types untuk modul jurnal
 
 export type JournalStatus = "draft" | "posted";
 export type EntryType = "debit" | "credit";
 
-// ─── Domain Models ─────────────────────────────────────────────────────────────
-
+// Satu baris detail jurnal
 export interface JournalLine {
   id: number;
   accountCode: string;
@@ -14,10 +13,11 @@ export interface JournalLine {
   credit: number;
 }
 
+// Satu entri jurnal lengkap
 export interface JournalEntry {
   id: string;
-  number: string;        // e.g. "JE-2024-001"
-  date: string;          // ISO date string
+  number: string;
+  date: string;
   description: string;
   status: JournalStatus;
   lines: JournalLine[];
@@ -26,27 +26,24 @@ export interface JournalEntry {
   createdAt: string;
 }
 
-// ─── Form Models ──────────────────────────────────────────────────────────────
-
+// Bentuk line jurnal di form frontend
 export interface JournalLineForm {
   uid: string;
-
   accountCode: string;
   accountName: string;
-
   description: string;
   debit: string;
   credit: string;
 }
 
+// Bentuk form jurnal di frontend
 export interface JournalEntryForm {
   date: string;
   description: string;
   lines: JournalLineForm[];
 }
 
-// ─── API Payloads ─────────────────────────────────────────────────────────────
-
+// Payload saat create jurnal ke backend
 export interface CreateJournalPayload {
   entry_date: string;
   description: string;
@@ -57,14 +54,15 @@ export interface CreateJournalPayload {
     memo?: string;
   }[];
 }
-// ─── UI Helpers ───────────────────────────────────────────────────────────────
 
+// Tipe toast lokal untuk modul jurnal
 export interface Toast {
   id: number;
   msg: string;
   type: "success" | "error";
 }
 
+// Error validasi form jurnal
 export type JournalFormErrors = {
   date?: string;
   description?: string;

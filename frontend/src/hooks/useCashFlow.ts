@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import type { CashFlowResponse } from "../types/reports";
 import { reportsService } from "../services/reportsService";
 
+// Hook untuk mengambil dan mengelola data laporan arus kas
 export function useCashFlow(initialPeriodId?: string) {
   const [periodId, setPeriodId] = useState<string | undefined>(initialPeriodId);
   const [data, setData] = useState<CashFlowResponse | null>(null);

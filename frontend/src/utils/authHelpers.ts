@@ -1,3 +1,6 @@
+// Helper validasi dan indikator kekuatan password untuk halaman auth
+
+// Menilai kekuatan password berdasarkan panjang, huruf besar, angka, dan simbol
 export function getPasswordStrength(password: string): {
   score: number;
   label: string;
@@ -16,6 +19,7 @@ export function getPasswordStrength(password: string): {
   return { score, label: "Kuat", color: "#1d9e75" };
 }
 
+// Validasi form register di frontend sebelum dikirim ke backend
 export function validateRegisterForm(form: {
   fullName: string;
   email: string;
@@ -33,6 +37,7 @@ export function validateRegisterForm(form: {
     password?: string;
     companyName?: string;
   } = {};
+
   if (!form.fullName.trim()) errors.fullName = "Nama lengkap wajib diisi.";
   if (!form.email.trim()) {
     errors.email = "Email wajib diisi.";
@@ -46,5 +51,6 @@ export function validateRegisterForm(form: {
   }
   if (!form.companyName.trim())
     errors.companyName = "Nama perusahaan wajib diisi.";
+
   return errors;
 }

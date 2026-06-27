@@ -1,21 +1,18 @@
 import { useState, useMemo, useEffect } from "react";
 
-/**
- * usePagination — utilitas paginasi sederhana.
- * Default 5 item per halaman, dengan tombol next/prev untuk
- * menggeser ke data selanjutnya.
- */
+// Hook pagination sederhana untuk memotong list per halaman
 export function usePagination<T>(items: T[], pageSize = 5) {
   const [page, setPage] = useState(1);
 
   const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
 
-  // Pastikan halaman tetap valid saat data berubah (misal setelah filter)
+  // Jaga agar nomor halaman tetap valid saat jumlah data berubah
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
     if (page < 1) setPage(1);
   }, [page, totalPages]);
 
+  // Ambil item yang tampil di halaman aktif
   const pageItems = useMemo(() => {
     const start = (page - 1) * pageSize;
     return items.slice(start, start + pageSize);

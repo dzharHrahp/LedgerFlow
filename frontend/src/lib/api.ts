@@ -1,9 +1,11 @@
-import axios from 'axios'
+import axios from "axios";
 
+// Axios instance utama untuk semua request API frontend -> backend
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
 });
 
+// Interceptor request: otomatis kirim token dan info user/company dari localStorage
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
@@ -11,7 +13,6 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // Tambah x-user-id dari localStorage untuk payment routes
   const userStr = localStorage.getItem("user");
   if (userStr) {
     try {
@@ -28,18 +29,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Interceptor response: jika token invalid, arahkan ulang ke login
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    // Jangan redirect ke login untuk payment routes yang memang bisa 401
-    // (misal user belum login tapi buka pricing page)
     const url = err.config?.url || "";
     const isPaymentRoute = url.includes("/api/payments/");
 
     if (err.response?.status === 401 && !isPaymentRoute) {
-      localStorage.removeItem('token')
-      window.location.href = '/login'
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
-    return Promise.reject(err)
-  }
-)
+    return Promise.reject(err);
+  },
+);

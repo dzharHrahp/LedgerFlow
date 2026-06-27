@@ -1,43 +1,41 @@
-// ─── Account selector ─────────────────────────────────────────────────────────
+// Types untuk modul buku besar
 
+// Saldo normal akun di frontend
 export type NormalBalance = "Debit" | "Credit";
 
-/** Slim account shape returned by GET /api/accounts (only fields we need) */
+// Bentuk akun ringkas untuk dropdown/select buku besar
 export interface AccountOption {
-  id: string; // UUID (sesuai database)
+  id: string;
   code: string;
   name: string;
   normalBalance: NormalBalance;
   isActive: boolean;
 }
 
-// ─── Period ───────────────────────────────────────────────────────────────────
-
+// Bentuk periode akuntansi untuk filter ledger
 export interface Period {
-  id: string; // UUID (sesuai database)
-  name: string; // e.g. "Januari 2024"
+  id: string;
+  name: string;
   startDate: string;
   endDate: string;
   isActive: boolean;
 }
 
-// ─── Ledger response ──────────────────────────────────────────────────────────
-
-/** One row in the ledger table */
+// Satu baris transaksi pada laporan buku besar
 export interface LedgerLine {
-  id: string; // UUID (sesuai database)
+  id: string;
   date: string;
   journalNumber: string;
   description: string;
   debit: number;
   credit: number;
-  balance: number; // running balance, pre-calculated by backend
+  balance: number;
 }
 
-/** Full response from GET /api/ledger */
+// Hasil lengkap response ledger dari backend
 export interface LedgerResult {
   account: AccountOption;
-  period: Period | null; // null when using custom date range
+  period: Period | null;
   startDate: string;
   endDate: string;
   openingBalance: number;
@@ -47,21 +45,20 @@ export interface LedgerResult {
   lines: LedgerLine[];
 }
 
-// ─── Query params ─────────────────────────────────────────────────────────────
-
+// Parameter query saat mengambil ledger
 export interface LedgerQueryParams {
-  accountId: string; // UUID
-  periodId?: string; // UUID
+  accountId: string;
+  periodId?: string;
   startDate?: string;
   endDate?: string;
 }
 
-// ─── UI helpers ───────────────────────────────────────────────────────────────
-
+// Tipe toast lokal sederhana
 export interface Toast {
   id: number;
   msg: string;
   type: "success" | "error";
 }
 
+// Mode filter tanggal pada UI ledger
 export type DateRangeMode = "period" | "custom";

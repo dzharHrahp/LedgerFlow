@@ -1,21 +1,15 @@
 // ============================================================================
 // LEDGERFLOW - useSubscription Hook
 // ============================================================================
-// Usage:
-//   const { subscription, isLoading, isPro, isEnterprise, isTrial,
-//           trialDaysLeft, canAccess, refresh } = useSubscription();
-//
-//   if (!canAccess("export_pdf")) { showPaywall(); }
-// ============================================================================
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   getSubscription,
   checkFeatureAccess,
   type Subscription,
-} from "../services/paymentService"
+} from "../services/paymentService";
 
-// Feature → minimum plan
+// Mapping fitur ke plan minimum yang boleh mengaksesnya
 const FEATURE_PLAN: Record<string, string[]> = {
   income_statement: ["pro", "enterprise"],
   balance_sheet: ["pro", "enterprise"],
@@ -28,6 +22,7 @@ const FEATURE_PLAN: Record<string, string[]> = {
   api_access: ["enterprise"],
 };
 
+// Hook subscription: ambil data langganan user dan bantu cek hak akses fitur
 export function useSubscription() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +46,7 @@ export function useSubscription() {
     fetchSubscription();
   }, [fetchSubscription]);
 
-  // ─── Computed Properties ────────────────────────────────────────
+  // Computed properties agar komponen cukup pakai hasil siap pakai
   const planName = subscription?.plans?.name || "free";
   const isActive = subscription?.is_active ?? false;
   const isTrial = subscription?.is_trial ?? false;
@@ -61,28 +56,25 @@ export function useSubscription() {
   const isPro = planName === "pro";
   const isEnterprise = planName === "enterprise";
 
-  // Check if user can access a specific feature (client-side check)
+  // Cek akses fitur di sisi client berdasarkan plan aktif user
   const canAccess = useCallback(
     (feature: string): boolean => {
       if (!isActive) return false;
 
-      // Trial = sama kayak Free (tetap dibatasi, harus bayar dulu)
-      // Fitur premium hanya bisa diakses kalau SUDAH BAYAR (plan pro/enterprise)
-
       const allowedPlans = FEATURE_PLAN[feature];
-      if (!allowedPlans) return true; // feature not gated
+      if (!allowedPlans) return true;
       return allowedPlans.includes(planName);
     },
-    [isActive, planName]
+    [isActive, planName],
   );
 
-  // Get required plan for a feature
+  // Ambil plan minimum yang dibutuhkan untuk fitur tertentu
   const getRequiredPlan = useCallback((feature: string): string | null => {
     const plans = FEATURE_PLAN[feature];
     return plans ? plans[0] : null;
   }, []);
 
-  // Summary for display
+  // Ringkasan subscription yang siap dipakai di UI
   const subscriptionSummary = useMemo(() => {
     if (!subscription) return null;
 
@@ -102,8 +94,6 @@ export function useSubscription() {
     subscriptionSummary,
     isLoading,
     error,
-
-    // Plan checks
     planName,
     isActive,
     isFree,
@@ -111,12 +101,8 @@ export function useSubscription() {
     isEnterprise,
     isTrial,
     trialDaysLeft,
-
-    // Feature checks
     canAccess,
     getRequiredPlan,
-
-    // Actions
     refresh: fetchSubscription,
   };
 }

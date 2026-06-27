@@ -6,16 +6,16 @@ import type {
 } from "../types/journal";
 import { journalService } from "../services/JournalService";
 
-// ✅ Fix 1: Ubah sorting ke ASCENDING (001 di atas)
+// Helper: urutkan jurnal berdasarkan nomor entry secara ascending
 function sortByEntryNumber(list: JournalEntry[]): JournalEntry[] {
   return [...list].sort((a, b) => {
-    // Sort by entry number ascending: JE-202606-0001 → JE-202606-0002
     const numA = a.number ?? "";
     const numB = b.number ?? "";
     return numA.localeCompare(numB);
   });
 }
 
+// Hook jurnal: handle fetch, create, post, delete, dan toast notifikasi lokal
 export function useJournal() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +25,7 @@ export function useJournal() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastId = useRef(0);
 
-  // ── Toast ──────────────────────────────────────────────────────────────────
+  // Helper toast lokal untuk feedback aksi jurnal
   const addToast = useCallback(
     (msg: string, type: Toast["type"] = "success") => {
       const id = ++toastId.current;
@@ -38,13 +38,13 @@ export function useJournal() {
     [],
   );
 
-  // ── Fetch all ──────────────────────────────────────────────────────────────
+  // Ambil semua jurnal dari backend
   const fetchEntries = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await journalService.getAll();
-      setEntries(sortByEntryNumber(data)); // ✅ pakai sort by number
+      setEntries(sortByEntryNumber(data));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Terjadi kesalahan");
     } finally {
@@ -56,18 +56,15 @@ export function useJournal() {
     fetchEntries();
   }, [fetchEntries]);
 
-  // ── Create ─────────────────────────────────────────────────────────────────
+  // Buat jurnal baru
   const createEntry = useCallback(
     async (payload: CreateJournalPayload): Promise<JournalEntry | null> => {
       setSaving(true);
       try {
         const created = await journalService.create(payload);
-
-        // ✅ Fix 2: Langsung update state + return created
         setEntries((prev) => sortByEntryNumber([...prev, created]));
-
-        addToast("Entry berhasil dibuat"); // ✅ tambah toast sukses
-        return created; // ✅ FIX: jangan lupa return!
+        addToast("Entry berhasil dibuat");
+        return created;
       } catch (e) {
         addToast(
           e instanceof Error ? e.message : "Gagal membuat entry",
@@ -81,7 +78,7 @@ export function useJournal() {
     [addToast],
   );
 
-  // ── Post ───────────────────────────────────────────────────────────────────
+  // Posting jurnal draft ke buku besar
   const postEntry = useCallback(
     async (id: string): Promise<boolean> => {
       setPosting(true);
@@ -105,7 +102,7 @@ export function useJournal() {
     [addToast],
   );
 
-  // ── Delete ─────────────────────────────────────────────────────────────────
+  // Hapus jurnal
   const deleteEntry = useCallback(
     async (id: string): Promise<boolean> => {
       try {

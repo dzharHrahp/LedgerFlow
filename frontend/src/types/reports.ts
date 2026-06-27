@@ -1,9 +1,12 @@
+// Types untuk modul laporan keuangan
+
 export interface IncomeStatementItem {
   accountCode: string;
   accountName: string;
   amount: number;
 }
 
+// Response laporan laba rugi
 export interface IncomeStatementResponse {
   periodId: string;
   revenue: IncomeStatementItem[];
@@ -20,6 +23,7 @@ export interface BalanceSheetAccount {
   balance: number;
 }
 
+// Response laporan neraca
 export interface BalanceSheetResponse {
   assets: BalanceSheetAccount[];
   liabilities: BalanceSheetAccount[];
@@ -30,6 +34,7 @@ export interface BalanceSheetResponse {
   is_balanced: boolean;
 }
 
+// Bentuk data periode akuntansi
 export interface Period {
   id: string;
   company_id: string;
@@ -52,6 +57,7 @@ export interface CashFlowSection {
   subtotal: number;
 }
 
+// Response laporan arus kas
 export interface CashFlowResponse {
   periodId: string | null;
   periodName: string;

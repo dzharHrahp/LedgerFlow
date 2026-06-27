@@ -2,17 +2,15 @@
 import { useState, useEffect } from "react";
 import { reportsService } from "../services/reportsService";
 
+// Ringkasan data dashboard dari beberapa laporan keuangan
 export interface DashboardSummary {
-  // Income Statement
   totalRevenue: number;
   totalExpense: number;
   netIncome: number;
-  // Balance Sheet
   totalAssets: number;
   totalLiabilities: number;
   totalEquity: number;
   isBalanced: boolean;
-  // Cash Flow
   beginningCash: number;
   endingCash: number;
   netCashFlow: number;
@@ -21,6 +19,7 @@ export interface DashboardSummary {
   financingCash: number;
 }
 
+// Hook dashboard: gabungkan income statement, balance sheet, dan cash flow
 export function useDashboardData(periodId?: string) {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +31,6 @@ export function useDashboardData(periodId?: string) {
       setLoading(true);
       setError(null);
       try {
-        // Ambil company_id dari localStorage (sama seperti reportsService lainnya)
         const userStr = localStorage.getItem("user");
         let companyId = "";
         if (userStr) {

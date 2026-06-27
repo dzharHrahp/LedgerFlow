@@ -7,13 +7,12 @@ import type {
 } from "../types/ledger";
 import { api } from "../lib/api";
 
-// ─── Mappers (snake_case / UPPERCASE dari DB -> bentuk frontend) ──────────────
-
-/** DB menyimpan 'DEBIT'/'CREDIT' (uppercase). Normalisasi ke "Debit"/"Credit". */
+// Helper: normalisasi normal balance dari format backend ke format frontend
 function normalizeBalance(nb: any): NormalBalance {
   return String(nb).toUpperCase() === "CREDIT" ? "Credit" : "Debit";
 }
 
+// Mapper data account dari backend -> frontend
 function mapAccount(a: any): AccountOption {
   return {
     id: a.id,
@@ -24,7 +23,6 @@ function mapAccount(a: any): AccountOption {
   };
 }
 
-// Periods di DB: { id, year, month, status } — diubah ke bentuk UI yang dipakai.
 const MONTH_NAMES_ID = [
   "Januari",
   "Februari",
@@ -40,8 +38,8 @@ const MONTH_NAMES_ID = [
   "Desember",
 ];
 
+// Mapper data periode dari backend -> frontend
 function mapPeriod(p: any): Period {
-  // Bila backend sudah mengirim startDate/endDate/name, pakai itu.
   if (p.startDate || p.start_date || p.name) {
     return {
       id: p.id,
@@ -53,7 +51,7 @@ function mapPeriod(p: any): Period {
       isActive: p.isActive ?? p.is_active ?? p.status === "open",
     };
   }
-  // Kalau backend mengirim { year, month, status } mentah, hitung di sini.
+
   const year = Number(p.year);
   const month = Number(p.month);
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -67,32 +65,25 @@ function mapPeriod(p: any): Period {
   };
 }
 
-// ─── Service (memakai instance `api` yang sama dgn journalService: token + baseURL) ─
-
+// Service buku besar: ambil akun referensi, periode, dan hasil ledger
 export const ledgerService = {
-  /** GET /api/accounts — reuse the same endpoint from COA module */
+  // Ambil daftar akun untuk dropdown/filter buku besar
   getAccounts: async (): Promise<AccountOption[]> => {
     const { data } = await api.get("/api/accounts");
     return (data ?? []).map(mapAccount);
   },
 
-  /** GET /api/periods (opsional — tabel periods mungkin belum ada) */
+  // Ambil daftar periode, kalau endpoint belum ada maka kembalikan array kosong
   getPeriods: async (): Promise<Period[]> => {
     try {
       const { data } = await api.get("/api/periods");
       return (data ?? []).map(mapPeriod);
     } catch {
-      // Tabel/endpoint periods belum tersedia -> kembalikan kosong,
-      // user tetap bisa pakai mode "Rentang Kustom".
       return [];
     }
   },
 
-  /**
-   * GET /api/ledger?account_id=&period_id=&start_date=&end_date=
-   *
-   * Exactly one of (period_id) OR (start_date + end_date) must be supplied.
-   */
+  // Ambil hasil buku besar berdasarkan account_id + period/range tanggal
   getLedger: async (params: LedgerQueryParams): Promise<LedgerResult> => {
     const query: Record<string, string> = {
       account_id: String(params.accountId),

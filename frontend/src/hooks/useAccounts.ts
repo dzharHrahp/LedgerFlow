@@ -4,17 +4,13 @@ import { accountsService } from "../services/accountsService";
 import { useToast } from "../context/ToastContext";
 import { pushNotification } from "../components/Header";
 
+// Helper: urutkan akun berdasarkan kode akun
 function sortByCode(list: Account[]): Account[] {
   return [...list].sort((a, b) => a.code.localeCompare(b.code));
 }
 
-/**
- * Menerjemahkan error dari backend menjadi pesan yang ramah.
- * Khususnya menangani kasus code akun duplikat (sering muncul sebagai
- * 500/409 dengan pesan unique constraint dari database).
- */
+// Helper: ubah error backend menjadi pesan yang lebih ramah untuk user
 function parseAccountError(e: unknown, code?: string): string {
-  // Axios-style error: e.response.data.{error|message}
   const anyErr = e as any;
   const status: number | undefined = anyErr?.response?.status;
   const serverMsg: string =
@@ -25,7 +21,6 @@ function parseAccountError(e: unknown, code?: string): string {
 
   const lower = serverMsg.toLowerCase();
 
-  // Deteksi duplikat dari berbagai kemungkinan pesan DB / backend
   const looksDuplicate =
     status === 409 ||
     lower.includes("duplicate") ||
@@ -50,6 +45,7 @@ function parseAccountError(e: unknown, code?: string): string {
   return serverMsg || "Terjadi kesalahan saat menyimpan akun.";
 }
 
+// Hook akun: handle fetch, create/update, dan toggle status akun
 export function useAccounts() {
   const { toast } = useToast();
 
@@ -99,6 +95,7 @@ export function useAccounts() {
     fetchAccounts();
   }, [fetchAccounts]);
 
+  // Simpan akun: create kalau tanpa id, update kalau ada id
   const saveAccount = useCallback(
     async (data: AccountFormData, id?: string): Promise<boolean> => {
       setSaving(true);
@@ -134,12 +131,12 @@ export function useAccounts() {
     [toast, fetchAccounts],
   );
 
+  // Toggle status aktif/nonaktif akun dengan optimistic update
   const toggleStatus = useCallback(
     async (account: Account) => {
       setToggling(true);
       const newStatus = !account.isActive;
 
-      // 1. Optimistic update: langsung ubah UI
       setAccounts((prev) =>
         prev.map((acc) =>
           acc.id === account.id ? { ...acc, isActive: newStatus } : acc,
@@ -151,22 +148,21 @@ export function useAccounts() {
           code: account.code,
           name: account.name,
           type: account.type,
-          normal_balance: account.normalBalance === "Debit" ? "DEBIT" : "CREDIT",
-          is_active: newStatus, // ✅ sesuaikan dengan backend
+          normal_balance:
+            account.normalBalance === "Debit" ? "DEBIT" : "CREDIT",
+          is_active: newStatus,
         });
 
         const title = newStatus
           ? "Akun berhasil diaktifkan"
           : "Akun berhasil dinonaktifkan";
 
-        // Toast (global)
         toast({
           variant: "success",
           title,
           message: `${account.code} · ${account.name}`,
         });
 
-        // Notif header
         pushNotification({
           type: "account_toggled",
           title,
@@ -178,7 +174,6 @@ export function useAccounts() {
 
         return true;
       } catch (e) {
-        // 2. Rollback jika gagal
         setAccounts((prev) =>
           prev.map((acc) =>
             acc.id === account.id ? { ...acc, isActive: !newStatus } : acc,

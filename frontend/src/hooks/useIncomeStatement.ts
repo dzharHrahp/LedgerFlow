@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import type { IncomeStatementResponse } from "../types/reports";
 import { reportsService } from "../services/reportsService";
 
+// Hook untuk mengambil dan mengelola data laporan laba rugi
 export function useIncomeStatement(initialPeriodId?: string) {
   const [periodId, setPeriodId] = useState<string | undefined>(initialPeriodId);
   const [data, setData] = useState<IncomeStatementResponse | null>(null);
@@ -15,7 +16,11 @@ export function useIncomeStatement(initialPeriodId?: string) {
       const result = await reportsService.getIncomeStatement(periodId);
       setData(result);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Terjadi kesalahan saat memuat Laporan Laba Rugi");
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Terjadi kesalahan saat memuat Laporan Laba Rugi",
+      );
     } finally {
       setLoading(false);
     }

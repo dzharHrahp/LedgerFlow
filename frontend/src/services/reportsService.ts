@@ -1,4 +1,4 @@
-// src/services/reportsService.ts (UPDATED — dengan getCashFlow)
+// src/services/reportsService.ts
 import { api } from "../lib/api";
 import type {
   IncomeStatementResponse,
@@ -7,7 +7,7 @@ import type {
   Period,
 } from "../types/reports";
 
-// Fungsi pembantu untuk ambil Company ID dari localStorage
+// Helper: ambil company_id user dari localStorage
 const getCompanyId = () => {
   const userStr = localStorage.getItem("user");
   if (!userStr) return "";
@@ -19,6 +19,7 @@ const getCompanyId = () => {
   }
 };
 
+// Ambil laporan laba rugi
 export const getIncomeStatement = async (
   periodId?: string,
 ): Promise<IncomeStatementResponse> => {
@@ -34,6 +35,7 @@ export const getIncomeStatement = async (
   return data;
 };
 
+// Ambil laporan neraca
 export const getBalanceSheet = async (
   periodId: string,
   companyId: string,
@@ -50,7 +52,7 @@ export const getBalanceSheet = async (
   return data;
 };
 
-// ✨ BARU: Cash Flow
+// Ambil laporan arus kas
 export const getCashFlow = async (
   periodId?: string,
 ): Promise<CashFlowResponse> => {
@@ -63,6 +65,7 @@ export const getCashFlow = async (
   return data;
 };
 
+// Ambil daftar periode untuk filter laporan
 export const getPeriods = async (): Promise<Period[]> => {
   const userStr = localStorage.getItem("user");
   let companyId = "";
@@ -78,6 +81,7 @@ export const getPeriods = async (): Promise<Period[]> => {
   return Array.isArray(data) ? data : [];
 };
 
+// Gabungan fungsi service laporan
 export const reportsService = {
   getIncomeStatement,
   getBalanceSheet,

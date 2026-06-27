@@ -1,6 +1,7 @@
 import type { JournalEntry, CreateJournalPayload } from "../types/journal";
 import { api } from "../lib/api";
 
+// Mapper: ubah bentuk data backend menjadi bentuk yang dipakai frontend
 function mapJournal(j: any): JournalEntry {
   return {
     id: j.id,
@@ -33,18 +34,21 @@ function mapJournal(j: any): JournalEntry {
   };
 }
 
+// Service jurnal: handle semua request frontend ke endpoint journal backend
 export const journalService = {
+  // Ambil semua jurnal
   getAll: async (): Promise<JournalEntry[]> => {
     const { data } = await api.get("/api/journal");
     return data.map(mapJournal);
   },
 
+  // Ambil satu jurnal berdasarkan id
   getById: async (id: string): Promise<JournalEntry> => {
-    // FIX: kurung pembuka api.get() sebelumnya hilang -> syntax/runtime error.
     const { data } = await api.get(`/api/journal/${id}`);
     return mapJournal(data);
   },
 
+  // Buat jurnal baru dengan validasi dasar di frontend
   create: async (payload: CreateJournalPayload): Promise<JournalEntry> => {
     if (!payload.lines || payload.lines.length < 2) {
       throw new Error("Minimum 2 journal lines required");
@@ -58,24 +62,18 @@ export const journalService = {
 
     const { data } = await api.post("/api/journal", payload);
 
-    // PENTING:
-    // Response POST /api/journal TIDAK menyertakan relasi lengkap
-    // (mis. journal_entry_lines) dan/atau memakai struktur yang berbeda
-    // dengan response GET. Akibatnya bila langsung di-map akan menghasilkan
-    // date "Invalid Date", lines kosong ("0 baris"), dan total "RpNaN".
-    //
-    // Solusi: ambil ulang data lengkap by id agar struktur identik dengan
-    // getAll(). Inilah yang membuat tampilan benar tanpa perlu refresh manual.
+    // Setelah create, ambil ulang detail lengkap jurnal agar struktur datanya sama seperti GET
     return journalService.getById(data.id);
   },
 
+  // Posting jurnal draft menjadi posted
   post: async (id: string): Promise<JournalEntry> => {
     const { data } = await api.post(`/api/journal/${id}/post`);
     return mapJournal(data);
   },
 
+  // Hapus jurnal
   remove: async (id: string): Promise<void> => {
-    // FIX: kurung pembuka api.delete() sebelumnya hilang -> syntax/runtime error.
     await api.delete(`/api/journal/${id}`);
   },
 };

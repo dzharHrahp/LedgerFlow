@@ -8,6 +8,7 @@ import type {
 } from "../types/ledger";
 import { useToast } from "../context/ToastContext";
 
+// Hook buku besar: kelola data referensi akun/periode dan hasil ledger
 export function useLedger() {
   const { toast } = useToast();
 
@@ -20,6 +21,7 @@ export function useLedger() {
   const [refLoading, setRefLoading] = useState(false);
   const [refError, setRefError] = useState<string | null>(null);
 
+  // Ambil data referensi akun dan periode
   const fetchRefData = useCallback(async () => {
     setRefLoading(true);
     setRefError(null);
@@ -44,6 +46,7 @@ export function useLedger() {
     }
   }, [toast]);
 
+  // Ambil hasil buku besar berdasarkan filter yang dipilih user
   const fetchLedger = useCallback(
     async (params: LedgerQueryParams) => {
       setLedgerLoading(true);
