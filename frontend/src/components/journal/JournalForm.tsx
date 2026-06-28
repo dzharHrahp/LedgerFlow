@@ -55,6 +55,7 @@ function buildPayload(
   return {
     entry_date: form.date,
     description: form.description.trim(),
+    period_id: form.period_id,
     status: status || "draft",
     lines: form.lines
       .filter(
@@ -64,8 +65,6 @@ function buildPayload(
       )
       .map((l) => ({
         accountCode: l.accountCode.trim(),
-        accountName: l.accountName.trim(),
-        description: l.description.trim(),
         memo: l.description.trim(),
         debit: parseAmount(l.debit),
         credit: parseAmount(l.credit),
@@ -89,7 +88,7 @@ export function JournalForm({ saving, onSave, onBack }: JournalFormProps) {
     [form.lines],
   );
   const diff = Math.abs(totalDebit - totalCredit);
-  const isBalanced = diff < 0.005;
+  const isBalanced = diff < 0.001; // DIPERBAIKI: tolerance sama dengan backend
   const hasAmounts = totalDebit > 0 || totalCredit > 0;
 
   const validate = useCallback((): boolean => {
@@ -387,7 +386,7 @@ export function JournalForm({ saving, onSave, onBack }: JournalFormProps) {
             Simpan Draft
           </button>
 
-          {/* Simpan & Post — langsung posted */}
+          {/* Simpan & Post */}
           <button
             type="button"
             disabled={saving || !isBalanced || !hasAmounts}

@@ -1,7 +1,6 @@
 import type { JournalEntry, CreateJournalPayload } from "../types/journal";
 import { api } from "../lib/api";
 
-// Mapper: ubah bentuk data backend menjadi bentuk yang dipakai frontend
 function mapJournal(j: any): JournalEntry {
   return {
     id: j.id,
@@ -34,21 +33,17 @@ function mapJournal(j: any): JournalEntry {
   };
 }
 
-// Service jurnal: handle semua request frontend ke endpoint journal backend
 export const journalService = {
-  // Ambil semua jurnal
   getAll: async (): Promise<JournalEntry[]> => {
     const { data } = await api.get("/api/journal");
     return data.map(mapJournal);
   },
 
-  // Ambil satu jurnal berdasarkan id
   getById: async (id: string): Promise<JournalEntry> => {
     const { data } = await api.get(`/api/journal/${id}`);
     return mapJournal(data);
   },
 
-  // Buat jurnal baru dengan validasi dasar di frontend
   create: async (payload: CreateJournalPayload): Promise<JournalEntry> => {
     if (!payload.lines || payload.lines.length < 2) {
       throw new Error("Minimum 2 journal lines required");
@@ -60,19 +55,20 @@ export const journalService = {
       }
     }
 
-    const { data } = await api.post("/api/journal", payload);
-
-    // Setelah create, ambil ulang detail lengkap jurnal agar struktur datanya sama seperti GET
-    return journalService.getById(data.id);
+    try {
+      const { data } = await api.post("/api/journal", payload);
+      return journalService.getById(data.id);
+    } catch (error: any) {
+      console.error("Journal creation error:", error.response?.data);
+      throw error;
+    }
   },
 
-  // Posting jurnal draft menjadi posted
   post: async (id: string): Promise<JournalEntry> => {
     const { data } = await api.post(`/api/journal/${id}/post`);
     return mapJournal(data);
   },
 
-  // Hapus jurnal
   remove: async (id: string): Promise<void> => {
     await api.delete(`/api/journal/${id}`);
   },

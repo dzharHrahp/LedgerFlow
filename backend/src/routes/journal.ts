@@ -73,7 +73,6 @@ journal.get("/:id", async (c) => {
 });
 
 // POST /api/journal
-// Membuat jurnal baru dengan validasi periode dan double-entry
 journal.post("/", requireRole("owner", "akuntan"), async (c) => {
   const { company_id, sub: created_by } = c.get("user");
   const body = await c.req.json();
@@ -85,9 +84,27 @@ journal.post("/", requireRole("owner", "akuntan"), async (c) => {
     status: requestedStatus,
   } = body;
 
-  // Auto-detect period dari entry_date jika period_id tidak dikirim
+  // Validasi input dasar
+  if (!entry_date) {
+    return c.json({ error: "entry_date wajib diisi" }, 400);
+  }
+  if (!description || description.trim() === "") {
+    return c.json({ error: "description wajib diisi" }, 400);
+  }
+  if (!lines || lines.length < 2) {
+    return c.json({ error: "Minimal 2 baris required (debit + kredit)" }, 400);
+  }
+
+  // Validasi setiap line punya accountCode
+  for (const line of lines) {
+    if (!line.accountCode) {
+      return c.json({ error: "Semua baris harus memiliki accountCode" }, 400);
+    }
+  }
+
   let actualPeriodId = period_id;
 
+  // Auto-detect period dari entry_date jika period_id tidak dikirim
   if (!actualPeriodId && entry_date) {
     const date = new Date(entry_date);
     const { data: foundPeriod } = await supabase
@@ -104,10 +121,21 @@ journal.post("/", requireRole("owner", "akuntan"), async (c) => {
   }
 
   // Validasi periode: harus ada dan belum ditutup
+  if (!actualPeriodId) {
+    return c.json(
+      {
+        error:
+          "Periode tidak ditemukan. Pastikan periode untuk bulan ini sudah dibuat di settings.",
+      },
+      400,
+    );
+  }
+
   const { data: period } = await supabase
     .from("periods")
     .select("status")
     .eq("id", actualPeriodId)
+    .eq("company_id", company_id)
     .single();
 
   if (!period)
@@ -128,10 +156,6 @@ journal.post("/", requireRole("owner", "akuntan"), async (c) => {
     );
   }
 
-  if (!lines || lines.length < 2) {
-    return c.json({ error: "Minimal 2 baris required (debit + kredit)" }, 400);
-  }
-
   // Validasi double-entry: total debit harus sama dengan total kredit
   const totalDebit = lines.reduce(
     (s: number, l: any) => s + (Number(l.debit) || 0),
@@ -142,10 +166,10 @@ journal.post("/", requireRole("owner", "akuntan"), async (c) => {
     0,
   );
 
-  if (Math.abs(totalDebit - totalCredit) > 0.001) {
+  if (Math.abs(totalDebit - totalCredit) > 0.01) {
     return c.json(
       {
-        error: `Debit (${totalDebit}) harus sama dengan Kredit (${totalCredit})`,
+        error: `Debit (${totalDebit.toFixed(2)}) harus sama dengan Kredit (${totalCredit.toFixed(2)})`,
       },
       400,
     );
@@ -160,12 +184,11 @@ journal.post("/", requireRole("owner", "akuntan"), async (c) => {
     .eq("company_id", company_id)
     .like("entry_number", `${prefix}%`)
     .order("entry_number", { ascending: false })
-    .limit(1)
-    .single();
+    .limit(1);
 
   let nextNumber = 1;
-  if (last?.entry_number) {
-    const lastNum = parseInt(last.entry_number.split("-").pop() || "0");
+  if (last && last.length > 0 && last[0]?.entry_number) {
+    const lastNum = parseInt(last[0].entry_number.split("-").pop() || "0");
     nextNumber = lastNum + 1;
   }
   const entry_number = `${prefix}-${String(nextNumber).padStart(4, "0")}`;
@@ -184,7 +207,10 @@ journal.post("/", requireRole("owner", "akuntan"), async (c) => {
     .select()
     .single();
 
-  if (entryError) return c.json({ error: entryError.message }, 500);
+  if (entryError) {
+    console.error("Entry insert error:", entryError);
+    return c.json({ error: entryError.message }, 500);
+  }
 
   // Ubah accountCode dari frontend menjadi account_id dari database
   const accountCodes = lines.map((l: any) => l.accountCode);
@@ -196,24 +222,38 @@ journal.post("/", requireRole("owner", "akuntan"), async (c) => {
 
   const accountMap = new Map(accounts?.map((a) => [a.code, a.id]));
 
+  // Validasi semua accountCode ada di database
+  for (const code of accountCodes) {
+    if (!accountMap.has(code)) {
+      // Rollback: hapus entry yang sudah dibuat
+      await supabase.from("journal_entries").delete().eq("id", entry.id);
+      return c.json({ error: `Akun dengan kode ${code} tidak ditemukan` }, 400);
+    }
+  }
+
   const linesData = lines.map((l: any) => ({
     journal_entry_id: entry.id,
     account_id: accountMap.get(l.accountCode),
-    debit: l.debit ?? 0,
-    credit: l.credit ?? 0,
-    memo: l.memo || l.description || null,
+    debit: Number(l.debit) || 0,
+    credit: Number(l.credit) || 0,
+    memo: l.memo || null,
   }));
 
   const { error: linesError } = await supabase
     .from("journal_entry_lines")
     .insert(linesData);
-  if (linesError) return c.json({ error: linesError.message }, 500);
+
+  if (linesError) {
+    console.error("Lines insert error:", linesError);
+    // Rollback: hapus entry yang sudah dibuat
+    await supabase.from("journal_entries").delete().eq("id", entry.id);
+    return c.json({ error: linesError.message }, 500);
+  }
 
   return c.json(entry, 201);
 });
 
 // POST /api/journal/:id/post
-// Mengubah jurnal draft menjadi posted jika periodenya masih open
 journal.post("/:id/post", requireRole("owner", "akuntan"), async (c) => {
   const { company_id } = c.get("user");
   const id = c.req.param("id");
@@ -254,7 +294,6 @@ journal.post("/:id/post", requireRole("owner", "akuntan"), async (c) => {
 });
 
 // DELETE /api/journal/:id
-// Hapus jurnal hanya jika periodenya belum ditutup
 journal.delete("/:id", authMiddleware, async (c) => {
   const { company_id } = c.get("user");
   const id = c.req.param("id");

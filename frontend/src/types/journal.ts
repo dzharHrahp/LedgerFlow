@@ -1,11 +1,17 @@
-// Types untuk modul jurnal
+export interface JournalEntry {
+  id: string;
+  number: string;
+  date: string;
+  description: string;
+  status: "draft" | "posted";
+  createdAt: string;
+  lines: JournalLine[];
+  totalDebit: number;
+  totalCredit: number;
+}
 
-export type JournalStatus = "draft" | "posted";
-export type EntryType = "debit" | "credit";
-
-// Satu baris detail jurnal
 export interface JournalLine {
-  id: number;
+  id: string;
   accountCode: string;
   accountName: string;
   description: string;
@@ -13,20 +19,26 @@ export interface JournalLine {
   credit: number;
 }
 
-// Satu entri jurnal lengkap
-export interface JournalEntry {
-  id: string;
-  number: string;
-  date: string;
+export interface CreateJournalPayload {
+  entry_date: string;
   description: string;
-  status: JournalStatus;
-  lines: JournalLine[];
-  totalDebit: number;
-  totalCredit: number;
-  createdAt: string;
+  period_id?: string;
+  status?: "draft" | "posted";
+  lines: Array<{
+    accountCode: string;
+    debit: number;
+    credit: number;
+    memo?: string;
+  }>;
 }
 
-// Bentuk line jurnal di form frontend
+export interface JournalEntryForm {
+  date: string;
+  period_id?: string;
+  description: string;
+  lines: JournalLineForm[];
+}
+
 export interface JournalLineForm {
   uid: string;
   accountCode: string;
@@ -36,36 +48,11 @@ export interface JournalLineForm {
   credit: string;
 }
 
-// Bentuk form jurnal di frontend
-export interface JournalEntryForm {
-  date: string;
-  description: string;
-  lines: JournalLineForm[];
-}
-
-// Payload saat create jurnal ke backend
-export interface CreateJournalPayload {
-  entry_date: string;
-  description: string;
-  lines: {
-    accountCode: string;
-    debit: number;
-    credit: number;
-    memo?: string;
-  }[];
-}
-
-// Tipe toast lokal untuk modul jurnal
-export interface Toast {
-  id: number;
-  msg: string;
-  type: "success" | "error";
-}
-
-// Error validasi form jurnal
-export type JournalFormErrors = {
+export interface JournalFormErrors {
   date?: string;
   description?: string;
   lines?: string;
   balance?: string;
-};
+}
+
+export type FilterStatus = "all" | "active" | "inactive";
